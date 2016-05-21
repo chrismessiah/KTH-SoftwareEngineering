@@ -5,10 +5,9 @@
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
-public class Main {
-
-	Gui f = new Gui("Lab1");
+public class Main extends JFrame implements ActionListener{
 
 	MyButton myB1 = new MyButton(Color.white, Color.cyan, "On", "Off");
 	MyButton myB2 = new MyButton(Color.green, Color.red, "Run", "Stop");
@@ -22,6 +21,17 @@ public class Main {
 		obj.runProgram();
 	}
 
+	public Main() {
+		setTitle("Lab1");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setSize(400, 400);
+		setLocationRelativeTo(null);
+	}
+
+	public void actionPerformed(ActionEvent e) {
+		toggleState();
+	}
+
 	public void runProgram() {
 		buttonPanel.add(myB1);
 		buttonPanel.add(myB2);
@@ -31,8 +41,7 @@ public class Main {
 		parentPanel.setBackground(Color.GRAY);
 		buttonPanel.setBackground(Color.GRAY);
 
-		//f.pack();
-		f.add(parentPanel);
-		f.setVisible(true);
+		add(parentPanel);
+		setVisible(true);
 	}
 }

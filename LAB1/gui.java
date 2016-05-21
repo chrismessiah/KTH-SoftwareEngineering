@@ -4,17 +4,15 @@
 // ******************************************
 
 import javax.swing.*;
+import java.awt.*;
 
-public class gui extends JFrame{
+public class Gui extends JFrame{
 	
-	// setVisible(true);
-	// setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	
-	public static void gui(String[] args) {
-		
+	public Gui(String title) {
+		setTitle(title);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setSize(400, 400);
+		setLocationRelativeTo(null);
 	}
 
-	public static void main(String[] args) {
-		
-	}
 }

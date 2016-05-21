@@ -8,7 +8,7 @@ import java.awt.*;
 
 public class Main {
 
-	JFrame f = new JFrame("Lab1");
+	Gui f = new Gui("Lab1");
 
 	MyButton myB1 = new MyButton(Color.white, Color.cyan, "On", "Off");
 	MyButton myB2 = new MyButton(Color.green, Color.red, "Run", "Stop");
@@ -23,11 +23,6 @@ public class Main {
 	}
 
 	public void runProgram() {
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.setSize(400, 400);
-		//f.setResizable(false);
-		f.setLocationRelativeTo(null);
-
 		buttonPanel.add(myB1);
 		buttonPanel.add(myB2);
 

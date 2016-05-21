@@ -29,10 +29,18 @@ public class Main extends JFrame implements ActionListener{
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		toggleState();
+		Object btn = e.getSource();
+
+		System.out.println(btn.currentState);
+		System.out.println(e.getActionCommand());
+		//e.getActionCommand().toggleState();
 	}
 
 	public void runProgram() {
+
+		myB1.addActionListener(this);
+		myB2.addActionListener(this);
+
 		buttonPanel.add(myB1);
 		buttonPanel.add(myB2);
 

@@ -10,8 +10,8 @@ public class Main {
 
 	JFrame f = new JFrame("Lab1");
 
-	MyButton b1Obj = new MyButton(Color.white, Color.cyan, "On", "Off");
-	MyButton b2Obj = new MyButton(Color.green, Color.red, "Run", "Stop");
+	MyButton myB1 = new MyButton(Color.white, Color.cyan, "On", "Off");
+	MyButton myB2 = new MyButton(Color.green, Color.red, "Run", "Stop");
 	JPanel parentPanel = new JPanel();
 	JPanel buttonPanel = new JPanel();
 
@@ -28,8 +28,8 @@ public class Main {
 		//f.setResizable(false);
 		f.setLocationRelativeTo(null);
 
-		buttonPanel.add(b1Obj.b);
-		buttonPanel.add(b2Obj.b);
+		buttonPanel.add(myB1);
+		buttonPanel.add(myB2);
 
 		parentPanel.add(buttonPanel);
 		parentPanel.add(label);

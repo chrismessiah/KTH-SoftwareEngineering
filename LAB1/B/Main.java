@@ -7,10 +7,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class Main extends JFrame implements ActionListener{
+public class Main extends JFrame {
 
 	MyButton myB1 = new MyButton(Color.white, Color.cyan, "On", "Off");
 	MyButton myB2 = new MyButton(Color.green, Color.red, "Run", "Stop");
+	MyButton[] buttonList = new MyButton[] {myB1,myB2};
 	JPanel parentPanel = new JPanel();
 	JPanel buttonPanel = new JPanel();
 
@@ -28,19 +29,7 @@ public class Main extends JFrame implements ActionListener{
 		setLocationRelativeTo(null);
 	}
 
-	public void actionPerformed(ActionEvent e) {
-		Object btn = e.getSource();
-
-		System.out.println(btn.currentState);
-		System.out.println(e.getActionCommand());
-		//e.getActionCommand().toggleState();
-	}
-
 	public void runProgram() {
-
-		myB1.addActionListener(this);
-		myB2.addActionListener(this);
-
 		buttonPanel.add(myB1);
 		buttonPanel.add(myB2);
 

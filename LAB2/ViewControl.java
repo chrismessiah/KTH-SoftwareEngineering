@@ -7,7 +7,7 @@ class ViewControl extends JFrame implements ActionListener{
 
     private int size;
     private Square[][] btnBoard = new Square[4][4];        // Square är subklass till JButton
-    private JLabel message = new JLabel("Some Message");
+    private JLabel message = new JLabel("Some Message", SwingConstants.CENTER);
 
     FifteenModel model = new FifteenModel();
 
@@ -21,11 +21,11 @@ class ViewControl extends JFrame implements ActionListener{
 
 	public void runProgram() {
 		fillBtnBoard();
-		squarePanel.setBackground(Color.GRAY);
-		parentPanel.add(squarePanel);
-
-		parentPanel.add(message);
+		parentPanel.setLayout(new GridLayout(2, 1));
 		parentPanel.setBackground(Color.GRAY);
+		squarePanel.setBackground(Color.GRAY);
+		parentPanel.add(message);
+		parentPanel.add(squarePanel);
 
 		add(parentPanel);
 		setVisible(true);
@@ -35,7 +35,7 @@ class ViewControl extends JFrame implements ActionListener{
     ViewControl() {   	
        	setTitle("Lab2");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(400, 400);
+		setSize(500, 400);
 		setLocationRelativeTo(null);
     }
 

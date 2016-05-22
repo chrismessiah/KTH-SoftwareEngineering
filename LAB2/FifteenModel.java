@@ -21,6 +21,20 @@ public class FifteenModel implements Boardgame {
 		//printBoard();
 	}
 
+	public int[] findValueInBoard(int val) {
+		int[] ret = new int[2];
+		for (int i=0;i<status.length; i++ ) {
+			for (int i2=0;i2<status[i].length; i2++ ) {
+				if (status[i][i2] == val) {
+					ret[0] = i;
+					ret[1] = i2;
+					break;
+				}
+			}
+		}
+		return ret;
+	}
+
 	private void shuffleBoard() {
 		Random gen = new Random();
 		for (int i = 0; i<1000 ; i++) {

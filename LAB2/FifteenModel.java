@@ -11,8 +11,8 @@ public class FifteenModel implements Boardgame {
 	private String currentMessage = "No message yet";
 	private int[][] status = new int[4][4];  // spelplanen
 
-	public static void main(String[] args) {
-		FifteenModel obj = new FifteenModel();
+	public int[][] getBoard() {
+		return status;
 	}
 
 	public FifteenModel() {
@@ -32,6 +32,19 @@ public class FifteenModel implements Boardgame {
 	}
 
 	public boolean checkMove(int i, int j) {
+		int[] zeroPos = getEmptySpace();
+		if (zeroPos[0] != i && zeroPos[0] != i+1 && zeroPos[0] != i-1) {
+			return false;
+		}
+
+		if (zeroPos[1] != j && zeroPos[1] != j+1 && zeroPos[1] != j-1) {
+			return false;
+		}
+
+		if ( (zeroPos[0] == i+1 && zeroPos[1] == j+1) || (zeroPos[0] == i-1 && zeroPos[1] == j-1) || (zeroPos[0] == i-1 && zeroPos[1] == j+1) || (zeroPos[0] == i+1 && zeroPos[1] == j-1)) {
+			return false;
+		}
+
 		try {
 			int temp = status[i][j];
 			return true;
@@ -84,24 +97,20 @@ public class FifteenModel implements Boardgame {
 		status[3][3] = -1;
 	}
 
-	// public void printBoard() {
-	// 	for (int i = 0; i < status.length; i++) {
-	// 	    for (int j = 0; j < status[0].length; j++) {
-	// 	    	if (status[i][j] == -1) {
-	// 	    		System.out.print("- ");
-	// 	    	} else {
-	// 	        	System.out.print(status[i][j] + " ");
-	// 	        }
-	// 	    }
-	// 	    System.out.print("\n");
-	// 	}
+	public void printBoard() {
+		for (int i = 0; i < status.length; i++) {
+		    for (int j = 0; j < status[0].length; j++) {
+		    	if (status[i][j] == -1) {
+		    		System.out.print("- ");
+		    	} else {
+		        	System.out.print(status[i][j] + " ");
+		        }
+		    }
+		    System.out.print("\n");
+		}
 
-	// 	System.out.print("\n");
-	// }
-
-	// public boolean checkWin() {
-
-	// }
+		System.out.print("\n");
+	}
 
 	public boolean move(int i, int j) {
 		if (!checkMove(i,j)) {
@@ -111,7 +120,7 @@ public class FifteenModel implements Boardgame {
 		int[] pos = getEmptySpace();
 		status[ pos[0] ][ pos[1] ] = status[i][j];
 		status[ i ][ j ] = -1;
-		currentMessage = "good move";
+		currentMessage = "Nice!";
 		return true;
 	}
 

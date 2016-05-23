@@ -21,7 +21,7 @@ public class Server {
 } 
 
 class ClientHandler extends Thread {
-	
+
 	static int antaltr=0;
 	BufferedReader in;
 	PrintWriter ut;

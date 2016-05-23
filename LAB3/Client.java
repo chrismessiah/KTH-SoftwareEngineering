@@ -15,32 +15,49 @@ public class Client {
 	// 	obj.run();
 	// }
 
-	public Client() {
-		initConn();
+	// public Client() {
+	// 	initConn();
+	// 	talkToServer("Christian");
+	// }
+
+	// private void run() {
+	// 	initConn();
+	// 	talkToServer("Christian");
+	// 	disconnectServer();
+	// }
+
+	private void disconnectServer() {
+		pushToServer("");
 	}
 
-	private void run() {
-		initConn();
-		talkToServer("Christian");
-		talkToServer("Wharrup?");
-		disconnectServer();
-	}
-
-	public void disconnectServer() {
-		talkToServer("");
-	}
-
-	public void talkToServer(String smallTalk) {
+	private void serverfirstResponse() {
+		pushToServer("Tja!");
 		try {
-			ut.println(smallTalk);
-			ut.flush();
+			in.readLine();
+		} catch (IOException e) {
+			System.out.println(e);
+		}
+	}
+
+	private void pushToServer(String str) {
+		ut.println(str);
+		ut.flush();
+	}
+
+	public String talkToServer(String smallTalk) {
+		try {
+			initConn();
+			serverfirstResponse();
+			pushToServer(smallTalk);
 			String response = in.readLine();
-			System.out.println(response);
+			disconnectServer();
+			return response;
 		} catch (UnknownHostException e){
 			System.out.println(e);
 		} catch (IOException e) {
 			System.out.println(e);
 		}
+		return "";
 	}
 
 	private void initConn() {

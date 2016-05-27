@@ -1,6 +1,6 @@
 # Software Engineering
 
-This repo contains the labs of the course [Software Engineering](https://www.kth.se/student/kurser/kurs/DD2385?l=en) held at KTH, Royal Institute of Technology. The purpose of this repo is to allow us collaborate with the task.
+This repo contains the labs of the course [Software Engineering](https://www.kth.se/student/kurser/kurs/DD2385?l=en) held at KTH, Royal Institute of Technology.
 
 ### Course Description
 

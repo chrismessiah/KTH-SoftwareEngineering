@@ -5,14 +5,20 @@ public class Tester {
 	public static void main(String[] args) {
 		Tester obj = new Tester();
 		obj.run();
+		//obj.error();
 	}
 
-	public void run () {
-		Human.create("930429-1212"); // man 
-		Human.create("930429-2121"); // woman 
-		Human.create("930429-2101"); // woman 
-		Human.create("930429-2191"); // man 
-		//Woman h = new Woman(){};
+	// public void error() {
+	// 	new Human(){};
+	// 	new Man();
+	// 	new Woman();
+	// }
+
+	public void run() {
+		Human man = Human.create("Charles", "930429-1212");
+		Human woman = Human.create("Beatrice", "930429-2121");
+		System.out.println(man.toString());
+		System.out.println(woman.toString());
 	}
 
 }

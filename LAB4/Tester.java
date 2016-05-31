@@ -1,10 +1,11 @@
 public class Tester {
 
 	public static void main(String[] args) {
-		new Tester();
+		Tester obj = new Tester();
+		obj.run();
 	}
 
-	public void Tester () {
+	public void run () {
 		Composite suitcase = new Composite("suitcase", 20);
 
 		Leaf shirt = new Leaf("shirt", 4);

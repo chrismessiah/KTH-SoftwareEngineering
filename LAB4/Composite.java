@@ -8,7 +8,7 @@ public class Composite implements Component {
 	private int weight;
 	private List<Component> content;
 
-	public void Composite(String name, int weight) {
+	public Composite(String name, int weight) {
 		this.name = name;
 		this.weight = weight;
 		content =  new ArrayList<Component>();
@@ -37,10 +37,11 @@ public class Composite implements Component {
 
 	public String toString() {
 		// behållarens namn följt av namnen på alla saker som finns i behållaren.
-		String ret = "Container: " + name + "\n\n Content:\n";
+		String ret = name.toUpperCase() + "{";
 		for (Component thing : content) {
-			ret += (thing.toString() + "\n");
+			ret += (thing.toString() + ", ");
 		}
+		ret += "}";
 		return ret;
 	}
 }

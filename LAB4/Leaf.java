@@ -4,7 +4,7 @@ public class Leaf implements Component  {
 	private String name;
 	private int weight;
 
-	public void Leaf(String name, int weight) {
+	public Leaf(String name, int weight) {
 		this.name = name;
 		this.weight = weight;
 	}

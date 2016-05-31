@@ -28,6 +28,7 @@ public class Tester {
 		bag.add(soap);
 
 		System.out.println(suitcase.toString());
+		System.out.println(suitcase.getWeight());
 	}
 
 }

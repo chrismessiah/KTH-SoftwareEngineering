@@ -1,4 +1,4 @@
-public class Leaf implements Component  {
+public class Leaf extends Component  {
 	// Detta ör jeans, T-shirt, tvål, schampoo
 	
 	private String name;

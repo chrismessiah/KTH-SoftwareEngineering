@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Composite implements Component {
+public class Composite extends Component {
 	// Detta är en resväska, necessär, påse
 
 	private String name;

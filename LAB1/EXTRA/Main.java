@@ -9,6 +9,7 @@ import java.awt.event.*;
 
 public class Main extends JFrame {
 
+	boolean useSound = true;
 	String[] args;
 	MyButton[] buttonList;
 	JPanel parentPanel = new JPanel();

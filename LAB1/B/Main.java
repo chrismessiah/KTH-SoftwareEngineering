@@ -1,10 +1,10 @@
 
-// ****************************************** 
+// ******************************************
 //				author: Christian Abdelmassih
 // ******************************************
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.*; // GUI, JPanel etc
+import java.awt.*; // Color, Event
 import java.awt.event.*;
 
 public class Main extends JFrame {

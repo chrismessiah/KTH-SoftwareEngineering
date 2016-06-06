@@ -7,7 +7,7 @@ public class FifteenModel implements Boardgame {
   // Implementera Boardgame-metoderna
   // Deklarera variabler och övriga metoder som ni
   // tycker behövs för ett femtonspel
-	
+
 	private String currentMessage = "No message yet";
 	private int[][] status = new int[4][4];  // spelplanen
 
@@ -144,7 +144,7 @@ public class FifteenModel implements Boardgame {
 	   		return "-";
 	   	}
 		return Integer.toString(num);
-	}   
+	}
 
 	public String getMessage() {
 		return currentMessage;

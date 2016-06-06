@@ -10,22 +10,6 @@ public class Client {
 	private BufferedReader in;
 	private PrintWriter ut;
 
-	// public static void main(String[] args) {
-	// 	Client obj = new Client();
-	// 	obj.run();
-	// }
-
-	// public Client() {
-	// 	initConn();
-	// 	talkToServer("Christian");
-	// }
-
-	// private void run() {
-	// 	initConn();
-	// 	talkToServer("Christian");
-	// 	disconnectServer();
-	// }
-
 	private void disconnectServer() {
 		pushToServer("");
 	}

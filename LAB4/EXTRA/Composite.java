@@ -8,8 +8,12 @@ public class Composite extends Component implements Iterable {
 	private int weight;
 	private List<Component> content;
 
-	public MyIterator iterator() {
-		return new MyIterator(content);
+	// public DFSIterator iterator() {
+	// 	return new DFSIterator(content);
+	// }
+
+	public BFSIterator iterator() {
+		return new BFSIterator(content);
 	}
 
 	public Composite(String name, int weight) {

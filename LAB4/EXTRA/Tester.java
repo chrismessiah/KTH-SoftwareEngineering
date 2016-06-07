@@ -1,3 +1,5 @@
+import java.util.Iterator;
+
 public class Tester {
 
 	public static void main(String[] args) {
@@ -26,7 +28,8 @@ public class Tester {
 		bag.add(new Leaf("hair_masque", 3));
 		bag.add(new Leaf("soap", 3));
 
-		MyIterator iter = root.iterator();
+		//DFSIterator iter = root.iterator();
+		BFSIterator iter = root.iterator();
 		while (iter.hasNext()) {
 			System.out.println(iter.next().toString());
 		}

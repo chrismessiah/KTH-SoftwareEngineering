@@ -4,7 +4,7 @@ public abstract class Human {
 	protected String name;
 	protected String gender;
 
-	protected Human(){}
+	Human(){}
 
 	public static Human create (String name, String ssn) {
 	 	// ssn == YYMMDD-NNNN

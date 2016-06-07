@@ -9,10 +9,12 @@ public class FifteenModel implements Boardgame {
   // tycker behövs för ett femtonspel
 
 	private String currentMessage = "No message yet";
-	private int[][] status = new int[4][4];  // spelplanen
+	private int sizeX = 4;
+	private int sizeY = 4;
+	private int[][] status = new int[sizeX][sizeY];  // spelplanen
 
-	public int[][] getBoard() {
-		return status;
+	public int[] getSize() {
+		return new int[] {sizeX, sizeY};
 	}
 
 	public FifteenModel() {
@@ -21,7 +23,8 @@ public class FifteenModel implements Boardgame {
 		//printBoard();
 	}
 
-	public int[] findValueInBoard(int val) {
+	public int[] findValueInBoard(String strVal) {
+		int val = Integer.parseInt(strVal);
 		int[] ret = new int[2];
 		for (int i=0;i<status.length; i++ ) {
 			for (int i2=0;i2<status[i].length; i2++ ) {

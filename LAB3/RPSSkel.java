@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.*;
 
 class RPSSkel extends JFrame implements ActionListener {
-		Gameboard myboard, computersboard;
+	Gameboard myboard, computersboard;
     int counter = 0; // To count ONE ... TWO  and on THREE you play
     // Socket socket;
     // BufferedReader in;
@@ -23,6 +23,7 @@ class RPSSkel extends JFrame implements ActionListener {
     	closebutton = new JButton("Close");
     	closebutton.addActionListener(new ActionListener() {
     		public void actionPerformed(ActionEvent e) {
+    			client.disconnectServer();
 		    	System.exit(0);
 			}
 		});

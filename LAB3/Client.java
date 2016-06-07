@@ -10,7 +10,12 @@ public class Client {
 	private BufferedReader in;
 	private PrintWriter ut;
 
-	private void disconnectServer() {
+	public Client() {
+		initConn();
+		serverfirstResponse();
+	}
+
+	public void disconnectServer() {
 		pushToServer("");
 	}
 
@@ -30,11 +35,9 @@ public class Client {
 
 	public String talkToServer(String smallTalk) {
 		try {
-			initConn();
-			serverfirstResponse();
 			pushToServer(smallTalk);
 			String response = in.readLine();
-			disconnectServer();
+			//disconnectServer();
 			return response;
 		} catch (UnknownHostException e){
 			System.out.println(e);

@@ -79,9 +79,6 @@ class RPSSkel extends JFrame implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		if (useSound) {
-			// code for sound
-		}
 		counter += 1;
 		if (counter != 3) {
 			if (counter == 1) {
@@ -94,6 +91,7 @@ class RPSSkel extends JFrame implements ActionListener {
 			counter = 0;
 			countLabel.setText(" ");
 			String action = e.getActionCommand();
+			System.out.println(action);
 			String response = client.talkToServer(action);
 			myboard.markPlayed(action);
 			computersboard.markPlayed(response);

@@ -6,27 +6,48 @@ public class Tester {
 	}
 
 	public void run () {
-		Composite suitcase = new Composite("suitcase", 20);
+		Composite root = new Composite("root", 20);
 
-		suitcase.add(new Leaf("shirt", 4));
-		suitcase.add(new Leaf("shoes", 7));
-		suitcase.add(new Leaf("socks", 1));
 		Composite box = new Composite("box", 0);
-		suitcase.add(box);
+		Composite bag = new Composite("bag", 0);
+
+		root.add(new Leaf("shirt", 4));
+		root.add(box);
+		root.add(new Leaf("shoes", 7));
+		root.add(bag);
+		root.add(new Leaf("socks", 1));
 
 		box.add(new Leaf("camera", 1));
 		box.add(new Leaf("phone", 2));
 		box.add(new Leaf("laptop", 9));
-		Composite bag = new Composite("bag", 0);
-		box.add(bag);
 
 		bag.add(new Leaf("shampoo", 2));
 		bag.add(new Leaf("conditioner", 2));
 		bag.add(new Leaf("hair_masque", 3));
 		bag.add(new Leaf("soap", 3));
 
-		System.out.println(suitcase.toString());
-		System.out.println(suitcase.getWeight());
+		MyIterator iter = root.iterator();
+		while (iter.hasNext()) {
+			System.out.println(iter.next().toString());
+		}
+
+		/*
+		STRUCTURE
+
+		shirt
+		BOX
+			camera
+			phone
+			laptop
+		shoes
+		BAG
+			shampoo
+			conditioner
+			hair_masque
+			soap
+		socks
+
+		*/
 	}
 
 }

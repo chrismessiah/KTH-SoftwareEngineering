@@ -8,7 +8,7 @@ public class Composite extends Component implements Iterable {
 	private int weight;
 	private List<Component> content;
 
-	private MyIterator iterator() {
+	public MyIterator iterator() {
 		return new MyIterator(content);
 	}
 
@@ -39,13 +39,18 @@ public class Composite extends Component implements Iterable {
 		return total_weight;
 	}
 
-	public String toString() {
+	public String toString2() {
 		// behållarens namn följt av namnen på alla saker som finns i behållaren.
 		String ret = name.toUpperCase() + "{";
 		for (Component thing : content) {
 			ret += (thing.toString() + ", ");
 		}
 		ret += "}";
+		return ret;
+	}
+
+	public String toString() {
+		String ret = name.toUpperCase();
 		return ret;
 	}
 }

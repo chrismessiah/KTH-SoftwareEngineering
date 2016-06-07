@@ -9,7 +9,6 @@ import java.awt.event.*;
 
 public class Main extends JFrame {
 
-	boolean useSound = true;
 	String[] args;
 	MyButton[] buttonList;
 	JPanel parentPanel = new JPanel();
@@ -35,7 +34,7 @@ public class Main extends JFrame {
 		int i=1;
 		int i2=0;
 		while (i < args.length) {
-			MyButton btn = new MyButton(Color.green, Color.red, args[i], args[i+1]);
+			MyButton btn = new MyButton(Color.green, Color.red, args[i], args[i+1], buttonList);
 			buttonPanel.add(btn);
 			buttonList[i2] = btn;
 			i2 += 1;

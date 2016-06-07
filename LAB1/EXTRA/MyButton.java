@@ -10,8 +10,9 @@ import java.awt.event.*;
 public class MyButton extends JButton implements ActionListener{
 
 	String state1, state2, currentState;
+	MyButton[] buttonList;
 	
-	public MyButton(Color bgColor, Color textColor, String state1, String state2) {
+	public MyButton(Color bgColor, Color textColor, String state1, String state2, MyButton[] buttonList) {
 		setBackground(bgColor);
 		setForeground(textColor);
 
@@ -20,6 +21,7 @@ public class MyButton extends JButton implements ActionListener{
 		this.state1 = state1;
 		this.currentState = state1;
 		this.state2 = state2;
+		this.buttonList = buttonList;
 
 		setBackground(bgColor);
 		setForeground(textColor);
@@ -27,7 +29,15 @@ public class MyButton extends JButton implements ActionListener{
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		this.toggleState();
+		Object source = e.getSource();
+		if (source instanceof MyButton) {
+			MyButton pressedButton = ((MyButton)source);
+			for (MyButton button : buttonList) {
+				if (button != pressedButton) {
+					button.toggleState();
+				}
+			}
+		}
 	}
 
 	public void toggleState() {

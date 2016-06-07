@@ -7,7 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class Main extends JFrame {
+public class Main extends JFrame implements ActionListener{
 
 	String[] args;
 	MyButton[] buttonList;
@@ -19,6 +19,18 @@ public class Main extends JFrame {
 	public static void main(String[] args) {
 		Main obj = new Main(args);
 		obj.runProgram();
+	}
+
+	public void actionPerformed(ActionEvent e) {
+		Object source = e.getSource();
+		if (source instanceof MyButton) {
+			MyButton pressedButton = ((MyButton)source);
+			for (MyButton button : buttonList) {
+				if (button != pressedButton) {
+					button.toggleState();
+				}
+			}
+		}
 	}
 
 	public Main(String[] args) {
@@ -34,7 +46,8 @@ public class Main extends JFrame {
 		int i=1;
 		int i2=0;
 		while (i < args.length) {
-			MyButton btn = new MyButton(Color.green, Color.red, args[i], args[i+1], buttonList);
+			MyButton btn = new MyButton(Color.green, Color.red, args[i], args[i+1]);
+			btn.addActionListener(this);
 			buttonPanel.add(btn);
 			buttonList[i2] = btn;
 			i2 += 1;

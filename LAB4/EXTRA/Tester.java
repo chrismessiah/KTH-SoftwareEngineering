@@ -8,16 +8,16 @@ public class Tester {
 	}
 
 	public void run () {
-		Composite root = new Composite("root", 20);
+		Composite suitcase = new Composite("suitcase", 20);
 
 		Composite box = new Composite("box", 0);
 		Composite bag = new Composite("bag", 0);
 
-		root.add(new Leaf("shirt", 4));
-		root.add(box);
-		root.add(new Leaf("shoes", 7));
-		root.add(bag);
-		root.add(new Leaf("socks", 1));
+		suitcase.add(new Leaf("shirt", 4));
+		suitcase.add(box);
+		suitcase.add(new Leaf("shoes", 7));
+		suitcase.add(bag);
+		suitcase.add(new Leaf("socks", 1));
 
 		box.add(new Leaf("camera", 1));
 		box.add(new Leaf("phone", 2));
@@ -28,28 +28,26 @@ public class Tester {
 		bag.add(new Leaf("hair_masque", 3));
 		bag.add(new Leaf("soap", 3));
 
-		//DFSIterator iter = root.iterator();
-		BFSIterator iter = root.iterator();
+		//DFSIterator iter = suitcase.iterator();
+		BFSIterator iter = suitcase.iterator();
 		while (iter.hasNext()) {
 			System.out.println(iter.next().toString());
 		}
 
 		/*
-		STRUCTURE
-
-		shirt
-		BOX
-			camera
-			phone
-			laptop
-		shoes
-		BAG
-			shampoo
-			conditioner
-			hair_masque
-			soap
-		socks
-
+		SUITCASE
+			shirt
+			BOX
+				camera
+				phone
+				laptop
+			shoes
+			BAG
+				shampoo
+				conditioner
+				hair_masque
+				soap
+			socks
 		*/
 	}
 

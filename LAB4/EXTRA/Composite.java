@@ -9,11 +9,15 @@ public class Composite extends Component implements Iterable {
 	private List<Component> content;
 
 	// public DFSIterator iterator() {
-	// 	return new DFSIterator(content);
+	// 	return new DFSIterator(this);
 	// }
 
 	public BFSIterator iterator() {
-		return new BFSIterator(content);
+		return new BFSIterator(this);
+	}
+
+	public List<Component> getContent() {
+		return content;
 	}
 
 	public Composite(String name, int weight) {

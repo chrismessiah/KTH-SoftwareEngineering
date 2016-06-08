@@ -1,22 +1,18 @@
 import java.util.Stack;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DFSIterator implements Iterator {
-  List<Component> componentData;
   Stack<Component> staq;
-  int index = 0;
-  int depthIndex = 0;
 
-  public DFSIterator(List<Component> componentData) {
-    this.componentData = componentData;
+  public DFSIterator(Composite compositeData) {
     staq = new Stack<Component>();
-    listElemsToStack(componentData, staq);
+    staq.push(compositeData);
   }
 
-  private void listElemsToStack(List<Component> componentList, Stack<Component> stack) {
+  private void listElemsToStack(Composite compositeData, Stack<Component> stack) {
+    List<Component> componentList = compositeData.getContent();
     int size = componentList.size();
     for (int i=size-1; i<size; i--) {
       Component temp = componentList.get(i);
@@ -37,10 +33,7 @@ public class DFSIterator implements Iterator {
     Component top = staq.pop();
     if (top instanceof Composite) {
       Composite topComp  = (Composite)top;
-      Iterator tempIterator = topComp.iterator();
-      DFSIterator iter = (DFSIterator)tempIterator;
-      listElemsToStack(iter.componentData, staq);
-      //top = next();
+      listElemsToStack(topComp, staq);
     }
     return top;
   }

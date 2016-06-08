@@ -1,32 +1,19 @@
-import java.util.Stack;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.LinkedList;
 
 public class BFSIterator implements Iterator {
-  List<Component> componentData;
-  Stack<Component> staq;
-  int index = 0;
-  int depthIndex = 0;
+  Queue<Component> q;
 
-  public BFSIterator(List<Component> componentData) {
-    this.componentData = componentData;
-    staq = new Stack<Component>();
-    listElemsToStack(componentData, staq);
-  }
-
-  private void listElemsToStack(List<Component> componentList, Stack<Component> stack) {
-    int size = componentList.size();
-    for (int i=size-1; i<size; i--) {
-      Component temp = componentList.get(i);
-      stack.push(temp);
-      if (i == 0) {break;}
-    }
+  public BFSIterator(Composite compositeData) {
+    q = new LinkedList<Component>();
+    q.add(compositeData);
   }
 
   public boolean hasNext() {
-    if (staq.empty()) {
+    if (q.peek() == null) {
       return false;
     }
     return true;
@@ -34,8 +21,14 @@ public class BFSIterator implements Iterator {
 
   // breadth first search
   public Component next() {
-    Component top = staq.pop();
-    return new Leaf("Hej", 2);
+    Component first = q.remove();
+    if (first instanceof Composite) {
+      Composite topComp  = (Composite)first;
+      for (Component comp : topComp.getContent()) {
+        q.add(comp);
+      }
+    }
+    return first;
   }
 
 

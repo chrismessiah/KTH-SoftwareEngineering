@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
 
 public class Composite extends Component implements Iterable {
 	// Detta är en resväska, necessär, påse
@@ -12,8 +13,13 @@ public class Composite extends Component implements Iterable {
 	// 	return new DFSIterator(this);
 	// }
 
-	public BFSIterator iterator() {
+	// public BFSIterator iterator() {
+	// 	return new BFSIterator(this);
+	// }
+
+	public Iterator iterator() {
 		return new BFSIterator(this);
+		//return new DFSIterator(this);
 	}
 
 	public List<Component> getContent() {

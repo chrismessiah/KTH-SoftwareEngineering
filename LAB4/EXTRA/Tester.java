@@ -28,8 +28,7 @@ public class Tester {
 		bag.add(new Leaf("hair_masque", 3));
 		bag.add(new Leaf("soap", 3));
 
-		//DFSIterator iter = suitcase.iterator();
-		BFSIterator iter = suitcase.iterator();
+		Iterator iter = suitcase.iterator();
 		while (iter.hasNext()) {
 			System.out.println(iter.next().toString());
 		}

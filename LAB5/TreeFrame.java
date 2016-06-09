@@ -2,7 +2,7 @@
 
 import javax.swing.*;
 import javax.swing.tree.*;
-import java.io.*;        
+import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 class TreeFrame extends JFrame implements ActionListener {
@@ -22,19 +22,19 @@ class TreeFrame extends JFrame implements ActionListener {
 
 		tree.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				if (box.isSelected())
-					showDetails(tree.getPathForLocation(e.getX(), 
-						e.getY()));
+				if (box.isSelected()) {
+					showDetails(tree.getPathForLocation( e.getX(), e.getY()) );
+				}
 			}
 		});
-		
+
 		controls = new JPanel();
 		box = new JCheckBox(showString);
 		initGUI();
 		c.add(controls, BorderLayout.NORTH);
-		c.add(tree, BorderLayout.CENTER);   
+		c.add(tree, BorderLayout.CENTER);
 		setVisible(true);
-	} 
+	}
 
 	public void actionPerformed(ActionEvent e) {
 		String cmd = e.getActionCommand();
@@ -47,10 +47,10 @@ class TreeFrame extends JFrame implements ActionListener {
 		controls.add(box);
 		addButton(closeString);
 		controls.setBackground(Color.lightGray);
-		controls.setLayout(new FlowLayout());    
+		controls.setLayout(new FlowLayout());
 		setSize(400, 400);
 	}
-	
+
 	void addButton(String n) {
 		JButton b = new JButton(n);
 		b.setFont(new Font("Dialog", Font.BOLD, 12));
@@ -78,4 +78,3 @@ class TreeFrame extends JFrame implements ActionListener {
 		new TreeFrame();
 	}
 }
-

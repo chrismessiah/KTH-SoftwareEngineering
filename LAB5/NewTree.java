@@ -12,26 +12,24 @@ import javax.xml.parsers.ParserConfigurationException;
 
 class NewTree extends TreeFrame {
 
-	String filePath;
+	public static String path;
 
 	public static void main(String[] args) {
-		new NewTree(args);
+		path = getFilePath(args);
+		new NewTree();
 	}
 
-	public NewTree(String[] argArray) {
-		getFilePath(argArray);
-		// initTree(); // DO NOT CALL FROM CONSTRUCT
-	}
-
-	public void getFilePath(String[] fileStr) {
+	public static String getFilePath(String[] fileStr) {
+		String filePath = "";
 		if (fileStr.length == 0) {filePath = "Life.xml";}
 		else {filePath = fileStr[0];}
+		return filePath;
 	}
 
 	// should create root, treeModel and tree.
-  public void initTree() {
-		//try {
-			File xmlFile = new File(filePath);
+  void initTree() {
+		try {
+			File xmlFile = new File(path);
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(xmlFile);
@@ -49,9 +47,9 @@ class NewTree extends TreeFrame {
 			child.add(new DefaultMutableTreeNode("Svampar"));
 
 
-		//} catch (SAXException|ParserConfigurationException|IOException e) {
-		//	System.out.println(e);
-		//}
+		} catch (SAXException|ParserConfigurationException|IOException e) {
+			System.out.println(e);
+		}
   }
 
 }

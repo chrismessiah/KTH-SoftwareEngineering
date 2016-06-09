@@ -37,8 +37,7 @@ class DirTree2 extends TreeFrame {
 
 	// Overrides method in TreeFrame
 	void showDetails(TreePath p){
-		if ( p == null )
-		return;
+		if ( p == null ) {return;}
 		File f = new File( p.getLastPathComponent().toString() );
 		JOptionPane.showMessageDialog( this, f.getPath() + "\n   " + getAttributes( f ) );
 	}

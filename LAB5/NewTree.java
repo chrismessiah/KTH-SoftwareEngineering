@@ -17,6 +17,7 @@ class NewTree extends TreeFrame {
 
 	public static String path;
 	public static Document doc;
+	Node rootXML;
 
 	public static void main(String[] args) {
 		path = getFilePath(args);
@@ -26,7 +27,7 @@ class NewTree extends TreeFrame {
 
 	public static String getFilePath(String[] fileStr) {
 		String filePath = "";
-		if (fileStr.length == 0) {filePath = "Life.xml";}
+		if (fileStr.length == 0) {filePath = "Liv.xml";}
 		else {filePath = fileStr[0];}
 		return filePath;
 	}
@@ -60,8 +61,12 @@ class NewTree extends TreeFrame {
 			NodeList childList = node.getChildNodes();
 			for (int i = 0; i < childList.getLength(); i++) {
 				Node childNode = childList.item(i);
+				// if (childNode.getNodeType() == Node.TEXT_NODE) {
+				// 	System.out.println(childNode.getNodeValue());
+				// }
 				if (childNode.getNodeType() == Node.ELEMENT_NODE) {
 					String childName = getNodeAttributeValue(childNode);
+					//System.out.println(childName);
 					DefaultMutableTreeNode childTree = new DefaultMutableTreeNode(childName);
 					nodeTree.add(childTree);
 					recursiveBuildUp(childNode, childTree);
@@ -70,14 +75,60 @@ class NewTree extends TreeFrame {
 		}
 	}
 
+	public String getTextContentOfNode(Node node) {
+		if (node.hasChildNodes()) {
+			NodeList childList = node.getChildNodes();
+			Node childNode = childList.item(0);
+			if (childNode.getNodeType() == Node.TEXT_NODE) {
+				return childNode.getNodeValue().trim();
+			}
+		}
+		return null;
+	}
+
+	public Node findChildByAttribute(Node parentNode, String attr) {
+		if (parentNode.hasChildNodes()) {
+			NodeList childList = parentNode.getChildNodes();
+			for (int i = 0; i < childList.getLength(); i++) {
+				Node childNode = childList.item(i);
+				if (childNode.getNodeType() == Node.ELEMENT_NODE) {
+					String childAttr = getNodeAttributeValue(childNode);
+					if (childAttr.equals(attr)) {
+						//System.out.println(childAttr);
+						return childNode;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
 	// should create root, treeModel and tree.
   public void initTree() {
-		Node rootXML = doc.getDocumentElement();
+		rootXML = doc.getDocumentElement();
 		String rootView = getNodeAttributeValue(rootXML);
 		root = new DefaultMutableTreeNode(rootView);
 		treeModel = new DefaultTreeModel(root);
 		tree = new JTree(treeModel);
 		recursiveBuildUp(rootXML, root);
   }
+
+	void showDetails(TreePath p){
+		if (p == null) {return;}
+		Node node = rootXML;
+		Object[] pathArray = p.getPath();
+		//System.out.println(p.toString());
+		for (int i=1;i<pathArray.length; i++) {
+			//System.out.println(i);
+			String name = pathArray[i].toString();
+			node = findChildByAttribute(node, name);
+		}
+		// System.out.println(node.getNodeName());
+		// System.out.println(getTextContentOfNode(node));
+		//System.out.println();
+		//p.getLastPathComponent().toString()
+		System.out.println( node.getNodeName() + ": " + getTextContentOfNode(node) );
+		//JOptionPane.showMessageDialog( node.getNodeName() + ": " + getTextContentOfNode(node) );
+	}
 
 }

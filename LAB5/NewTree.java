@@ -4,25 +4,55 @@ import javax.swing.*;
 import javax.swing.tree.*;
 import java.io.*;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+import javax.xml.parsers.ParserConfigurationException;
+
 class NewTree extends TreeFrame {
 
 	public static void main(String[] args) {
-		new NewTree();
+		new NewTree(args);
 	}
 
-	public NewTree() {}
+	public NewTree(String[] argArray) {
+		String path = getFilePath(argArray);
+			initTree(path);
+	}
+
+	public String getFilePath(String[] fileStr) {
+		String filePath;
+		if (fileStr.length == 0) {filePath = "Life.xml";}
+		else {filePath = fileStr[0];}
+		return filePath;
+	}
 
 	// should create root, treeModel and tree.
-  public void initTree() {
-		root = new DefaultMutableTreeNode("Liv");
-		treeModel = new DefaultTreeModel(root);
-		tree = new JTree(treeModel);
+  public void initTree(String filePath) {
+		try {
+			File xmlFile = new File(filePath);
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(xmlFile);
+			doc.getDocumentElement().normalize(); // Reason: http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
 
-		DefaultMutableTreeNode child = new DefaultMutableTreeNode("Växter");
-		root.add(child);
+			System.out.println(doc.getDocumentElement().getNodeName());
 
-		child.add(new DefaultMutableTreeNode("Djur"));
-		child.add(new DefaultMutableTreeNode("Svampar"));
+			//root = new DefaultMutableTreeNode(doc.getDocumentElement().getNodeName());
+			root = new DefaultMutableTreeNode("liv");
+
+			DefaultMutableTreeNode child = new DefaultMutableTreeNode("Växter");
+			root.add(child);
+			child.add(new DefaultMutableTreeNode("Djur"));
+			child.add(new DefaultMutableTreeNode("Svampar"));
+
+			treeModel = new DefaultTreeModel(root);
+			tree = new JTree(treeModel);
+
+		} catch (SAXException|ParserConfigurationException|IOException e) {
+			System.out.println(e);
+		}
   }
 
 }

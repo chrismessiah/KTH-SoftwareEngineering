@@ -117,18 +117,12 @@ class NewTree extends TreeFrame {
 		if (p == null) {return;}
 		Node node = rootXML;
 		Object[] pathArray = p.getPath();
-		//System.out.println(p.toString());
 		for (int i=1;i<pathArray.length; i++) {
-			//System.out.println(i);
 			String name = pathArray[i].toString();
 			node = findChildByAttribute(node, name);
 		}
-		// System.out.println(node.getNodeName());
-		// System.out.println(getTextContentOfNode(node));
-		//System.out.println();
-		//p.getLastPathComponent().toString()
-		System.out.println( node.getNodeName() + ": " + getTextContentOfNode(node) );
-		//JOptionPane.showMessageDialog( node.getNodeName() + ": " + getTextContentOfNode(node) );
+		String out = node.getNodeName() + ": " + getTextContentOfNode(node);
+		JOptionPane.showMessageDialog(this, out);
 	}
 
 }

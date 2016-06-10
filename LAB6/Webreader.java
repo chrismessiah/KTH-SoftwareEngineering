@@ -95,14 +95,9 @@ public class Webreader extends JEditorPane implements ActionListener {
 
   public Webreader() {
     setEditable(false);
-    try {
-      setPage(webpage);
-      getHrefLinks(webpage);
-    } catch (IOException e) {
-      System.out.println(e);
-      errorMessage();
-    }
 
+    setPageHanlder(webpage);
+    getHrefLinks(webpage);
     buildFrame();
     buildModel();
     updateModel();
@@ -116,18 +111,26 @@ public class Webreader extends JEditorPane implements ActionListener {
     cont.add(links);
     cont.setLayout(new GridLayout());
     parentPanel.add(cont);
-    
+
     frame.add(parentPanel);
     frame.pack();
     frame.setLocationRelativeTo(null);
     frame.setVisible(true);
   }
 
+  public void setPageHanlder(String url) {
+    try {
+      setPage(url);
+    } catch (IOException e) {
+      addressBar.setText("ERROR BAD URL");
+    }
+  }
+
   public void actionPerformed(ActionEvent e) {
     try {
       webpage = addressBar.getText();
       getHrefLinks(webpage);
-      setPage(webpage);
+      setPageHanlder(webpage);
       updateModel();
     } catch (Throwable t) {
       t.printStackTrace();

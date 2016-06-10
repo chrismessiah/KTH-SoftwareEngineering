@@ -26,7 +26,7 @@ public class Webreader extends JEditorPane implements ActionListener {
   public void getHrefLinks(String url) {
     try {
       InputStream in = new URL(url).openConnection().getInputStream();
-      InputStreamReader reader = new InputStreamReader(in, "UTF-8");
+      InputStreamReader reader = new InputStreamReader(in, "ISO-8859-1");
       String html = "";
       while(reader.ready()) {
          html += String.valueOf((char)reader.read());

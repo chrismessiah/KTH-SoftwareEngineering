@@ -14,11 +14,13 @@ public class Webreader extends JEditorPane implements ActionListener {
   JTextField addressBar;
   static String webpage;
   ArrayList<String> href, descr;
+  DefaultTableModel model;
+  JTable table;
+  JFrame frame;
 
   public static void main(String[] args) {
     webpage = initalWebpage();
     Webreader obj = new Webreader();
-    //obj.run();
   }
 
   public void getHrefLinks(String url) {
@@ -37,14 +39,11 @@ public class Webreader extends JEditorPane implements ActionListener {
       for (String line : lines) {
         if (line.length() > 5) {
           if (line.substring(0,6).equals("A HREF")) {
-            //System.out.println(line);
             subLines = line.split(">");
             String textUrl = subLines[0].substring(8, subLines[0].length()-1);
-            //System.out.println(textUrl);
             href.add(textUrl);
             if (subLines.length > 1) {
-              System.out.println(subLines[1]);
-              descr.add(subLines[1]);
+              descr.add(subLines[1].trim());
             } else {
               descr.add("");
             }
@@ -53,98 +52,75 @@ public class Webreader extends JEditorPane implements ActionListener {
       }
     } catch (IOException e) {
       System.out.println(e);
-      // setContentType("text/html");
-      // HTMLEditorKit kit = new HTMLEditorKit();
-      // setEditorKit(kit);
-      // Document doc = kit.createDefaultDocument();
-      // setDocument(doc);
-      // String htmlString = "<html><body><h1>Bad URL!</h1></body></html>";
-      // setText(htmlString);
     }
+  }
+
+  public void updateModel() {
+    int rows = model.getRowCount();
+    for (int i=0;i<rows;i++) {
+      model.removeRow(0);
+    }
+    for (int i=0;i<href.size(); i++) {
+      model.addRow(new Object[]{href.get(i), descr.get(i)});
+    }
+  }
+
+  public void buildFrame() {
+    frame = new JFrame();
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setPreferredSize(new Dimension(800,600));
+    frame.setTitle("LAB6");
+    addressBar = new JTextField();
+    addressBar.addActionListener(this);
+    addressBar.setText(webpage);
+    frame.add(addressBar, BorderLayout.NORTH);
+  }
+
+  public void buildModel() {
+    model = new DefaultTableModel();
+    table = new JTable(model);
+    model.addColumn("Webbadress");
+    model.addColumn("Beskrivning");
+  }
+
+  public void errorMessage() {
+    setContentType("text/html");
+    HTMLEditorKit kit = new HTMLEditorKit();
+    setEditorKit(kit);
+    Document doc = kit.createDefaultDocument();
+    setDocument(doc);
+    String htmlString = "<html><body><h1>Bad URL!</h1></body></html>";
+    setText(htmlString);
   }
 
   public Webreader() {
     setEditable(false);
     try {
-      //setContentType("text/html");
       setPage(webpage);
       getHrefLinks(webpage);
-
-      // InputStream in = new URL(webpage).openConnection().getInputStream();
-      // InputStreamReader reader = new InputStreamReader(in, "UTF-8");
-
-      //HTMLEditorKit kit = new HTMLEditorKit();
-      //Document doc = kit.createDefaultDocument();
-      //doc.putProperty("IgnoreCharsetDirective", Boolean.TRUE);
-      //setDocument(doc);
-
-      // String html = "";
-      // while(reader.ready()) {
-      //    html += String.valueOf((char)reader.read());
-      // }
-      // //setText(html);
-      // String trimmedHtml = html.replaceAll("\\s+","");
-      // ArrayList<String> href = new ArrayList<String>();
-      // ArrayList<String> descr = new ArrayList<String>();
-      // String[] lines = trimmedHtml.split("<");
-      // String[] subLines;
-      // for (String line : lines) {
-      //   if (line.length() > 5) {
-      //     if (line.substring(0,5).equals("AHREF")) {
-      //       System.out.println(line);
-      //       subLines = line.split(">");
-      //       href.add(subLines[0]);
-      //       descr.add(subLines[1]);
-      //     }
-      //   }
-      // }
-
     } catch (IOException e) {
       System.out.println(e);
-      setContentType("text/html");
-      HTMLEditorKit kit = new HTMLEditorKit();
-      setEditorKit(kit);
-      Document doc = kit.createDefaultDocument();
-      setDocument(doc);
-      String htmlString = "<html><body><h1>Bad URL!</h1></body></html>";
-      setText(htmlString);
+      errorMessage();
     }
 
-    JScrollPane web = new JScrollPane(this);
-    JFrame frame = new JFrame();
-
-    DefaultTableModel model = new DefaultTableModel();
-    JTable table = new JTable(model);
-    model.addColumn("Webbadress");
-    model.addColumn("Beskrivning");
-    for (int i=0;i<href.size(); i++) {
-      model.addRow(new Object[]{href.get(i), descr.get(i)});
-    }
-    JScrollPane links = new JScrollPane(table);
-
-    addressBar = new JTextField();
-    addressBar.addActionListener(this);
-    addressBar.setText(webpage);
-    frame.add(addressBar, BorderLayout.NORTH);
+    buildFrame();
+    buildModel();
+    updateModel();
 
     JPanel parentPanel = new JPanel(new BorderLayout());
+    JScrollPane web = new JScrollPane(this);
+    JScrollPane links = new JScrollPane(table);
+
     Container cont = new Container();
     cont.add(web);
     cont.add(links);
     cont.setLayout(new GridLayout());
     parentPanel.add(cont);
-
-
+    
     frame.add(parentPanel);
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setPreferredSize(new Dimension(800,600));
-    frame.setTitle("LAB6");
     frame.pack();
     frame.setLocationRelativeTo(null);
     frame.setVisible(true);
-
-    //JTable table = new JTable(50,2);
-    // add(table);
   }
 
   public void actionPerformed(ActionEvent e) {
@@ -152,17 +128,11 @@ public class Webreader extends JEditorPane implements ActionListener {
       webpage = addressBar.getText();
       getHrefLinks(webpage);
       setPage(webpage);
-      for (String link : href) {
-        System.out.println(link);
-      }
+      updateModel();
     } catch (Throwable t) {
       t.printStackTrace();
     }
   }
-
-  // public void run() {
-  //
-  // }
 
   public static String initalWebpage() {
     String url;

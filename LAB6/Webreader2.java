@@ -24,6 +24,7 @@ public class Webreader2 extends JEditorPane implements ActionListener {
   JTable table;
   JFrame frame;
   String html;
+  HTMLEditorKit kit;
 
   public static void main(String[] args) {
     webpage = initalWebpage();
@@ -32,22 +33,13 @@ public class Webreader2 extends JEditorPane implements ActionListener {
 
   public void getHtml() {
     try {
-      Document doc = getDocument();
-      //getDocument().putProperty( "Ignore-Charset", "true" );
-      //doc.putProperty("IgnoreCharsetDirective", Boolean.TRUE);
-
       InputStream in = new URL(webpage).openConnection().getInputStream();
       InputStreamReader reader = new InputStreamReader(in, "ISO-8859-1");
-      new HTMLEditorKit().read(reader,doc,0);
-
-      in = new URL(webpage).openConnection().getInputStream();
-      reader = new InputStreamReader(in, "ISO-8859-1");
       html = "";
       while(reader.ready()) {
          html += String.valueOf((char)reader.read());
       }
-      System.out.println(html);
-    } catch (IOException|BadLocationException e) {
+    } catch (IOException e) {
       System.out.println(e);
     }
   }
@@ -74,7 +66,7 @@ public class Webreader2 extends JEditorPane implements ActionListener {
     }
   }
 
-  public void updateModel() {
+  public void updateTableModel() {
     int rows = model.getRowCount();
     for (int i=0;i<rows;i++) {
       model.removeRow(0);
@@ -95,34 +87,24 @@ public class Webreader2 extends JEditorPane implements ActionListener {
     frame.add(addressBar, BorderLayout.NORTH);
   }
 
-  public void buildModel() {
+  public void buildTableModel() {
     model = new DefaultTableModel();
     table = new JTable(model);
     model.addColumn("Webbadress");
     model.addColumn("Beskrivning");
   }
 
-  // public void errorMessage() {
-  //   setContentType("text/html");
-  //   HTMLEditorKit kit = new HTMLEditorKit();
-  //   setEditorKit(kit);
-  //   Document doc = kit.createDefaultDocument();
-  //   setDocument(doc);
-  //   String htmlString = "<html><body><h1>Bad URL!</h1></body></html>";
-  //   setText(htmlString);
-  // }
-
   public Webreader2() {
+    kit = new HTMLEditorKit();
     setEditable(false);
     setContentType("text/html");
-    //getDocument().putProperty("IgnoreCharsetDirective", Boolean.TRUE);
 
+    setPageHanlder(webpage);
     getHtml();
     getHrefLinks();
-    //setPageHanlder(webpage);
     buildFrame();
-    buildModel();
-    updateModel();
+    buildTableModel();
+    updateTableModel();
 
     JPanel parentPanel = new JPanel(new BorderLayout());
     JScrollPane web = new JScrollPane(this);
@@ -142,18 +124,27 @@ public class Webreader2 extends JEditorPane implements ActionListener {
 
   public void setPageHanlder(String url) {
     try {
-      setPage(webpage);
-    } catch(IOException e) {}
-    //setText(html);
-    //addressBar.setText("ERROR BAD URL");
+      Document doc = kit.createDefaultDocument();
+      doc.putProperty("IgnoreCharsetDirective", new Boolean(true));
+      InputStream in = new URL(webpage).openConnection().getInputStream();
+      InputStreamReader reader = new InputStreamReader(in, "ISO-8859-1");
+      kit.read(reader,doc,0);
+      setDocument(doc);
+    } catch(IOException|BadLocationException e) {
+      System.out.println(e);
+      e.printStackTrace();
+      addressBar.setText("ERROR BAD URL");
+    }
   }
 
   public void actionPerformed(ActionEvent e) {
     try {
       webpage = addressBar.getText();
       getHrefLinks();
-      //setPageHanlder(webpage);
-      updateModel();
+      setPageHanlder(webpage);
+      getHtml();
+      getHrefLinks();
+      updateTableModel();
     } catch (Throwable t) {
       t.printStackTrace();
     }

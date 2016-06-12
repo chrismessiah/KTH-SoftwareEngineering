@@ -148,8 +148,6 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
   public void backAction() {
     history_index -= 1;
     String url = history.get(history_index);
-    System.out.println(history_index);
-    System.out.println(url);
     addressBar.setText(url);
     updatePage(false);
   }

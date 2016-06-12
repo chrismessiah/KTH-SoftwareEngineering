@@ -14,8 +14,10 @@ import javax.swing.text.html.*;
 import javax.swing.text.*;
 import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
-public class Webreader2 extends JEditorPane implements ActionListener {
+public class Webreader2 extends JEditorPane implements ActionListener, HyperlinkListener {
 
   JTextField addressBar;
   static String webpage;
@@ -105,6 +107,7 @@ public class Webreader2 extends JEditorPane implements ActionListener {
     buildFrame();
     buildTableModel();
     updateTableModel();
+    addHyperlinkListener(this);
 
     JPanel parentPanel = new JPanel(new BorderLayout());
     JScrollPane web = new JScrollPane(this);
@@ -137,16 +140,28 @@ public class Webreader2 extends JEditorPane implements ActionListener {
     }
   }
 
-  public void actionPerformed(ActionEvent e) {
-    try {
+  public void updatePage() {
+     try {
       webpage = addressBar.getText();
-      getHrefLinks();
       setPageHanlder(webpage);
       getHtml();
       getHrefLinks();
       updateTableModel();
     } catch (Throwable t) {
       t.printStackTrace();
+    }
+  }
+
+  public void actionPerformed(ActionEvent e) {
+    updatePage();
+  }
+
+  public void hyperlinkUpdate(HyperlinkEvent e) {
+    HyperlinkEvent.EventType eventType = e.getEventType();
+    if (eventType == HyperlinkEvent.EventType.ACTIVATED) {
+      String url = e.getURL().toString();
+      addressBar.setText(url);
+      updatePage();
     }
   }
 

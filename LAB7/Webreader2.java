@@ -21,7 +21,8 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
 
   JTextField addressBar;
   static String webpage;
-  ArrayList<String> href, descr;
+  ArrayList<String> href, descr, history;
+  int history_index = 0;
   DefaultTableModel model;
   JTable table;
   JFrame frame;
@@ -97,6 +98,7 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
   }
 
   public Webreader2() {
+    history = new ArrayList<String>();
     kit = new HTMLEditorKit();
     setEditable(false);
     setContentType("text/html");
@@ -109,6 +111,29 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     updateTableModel();
     addHyperlinkListener(this);
 
+    JPanel buttonPanel = new JPanel();
+
+    JButton backButton = new JButton("<");
+    backButton.setEnabled(false);
+    backButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          //actionBack();
+          System.out.println("Back");
+        }
+    });
+
+    JButton forwardButton = new JButton(">");
+    forwardButton.setEnabled(false);
+    forwardButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          //actionForward();
+          System.out.println("Forward");
+        }
+    });
+    buttonPanel.add(backButton);
+    buttonPanel.add(forwardButton);
+    buttonPanel.setLayout(new GridLayout());
+
     JPanel parentPanel = new JPanel(new BorderLayout());
     JScrollPane web = new JScrollPane(this);
     JScrollPane links = new JScrollPane(table);
@@ -117,7 +142,8 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     cont.add(web);
     cont.add(links);
     cont.setLayout(new GridLayout());
-    parentPanel.add(cont);
+    parentPanel.add(buttonPanel, BorderLayout.PAGE_START);
+    parentPanel.add(cont, BorderLayout.CENTER);
 
     frame.add(parentPanel);
     frame.pack();
@@ -133,6 +159,8 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
       InputStreamReader reader = new InputStreamReader(in, "ISO-8859-1");
       kit.read(reader,doc,0);
       setDocument(doc);
+      history.add(webpage);
+      history_index += 1;
     } catch(IOException|BadLocationException e) {
       System.out.println(e);
       e.printStackTrace();

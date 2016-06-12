@@ -22,12 +22,13 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
   JTextField addressBar;
   static String webpage;
   ArrayList<String> href, descr, history;
-  int history_index = 0;
+  int history_index = -1;
   DefaultTableModel model;
   JTable table;
   JFrame frame;
   String html;
   HTMLEditorKit kit;
+  JButton forwardButton, backButton;
 
   public static void main(String[] args) {
     webpage = initalWebpage();
@@ -103,32 +104,22 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     setEditable(false);
     setContentType("text/html");
 
-    setPageHanlder(webpage);
-    getHtml();
-    getHrefLinks();
     buildFrame();
     buildTableModel();
-    updateTableModel();
     addHyperlinkListener(this);
 
     JPanel buttonPanel = new JPanel();
 
-    JButton backButton = new JButton("<");
+    backButton = new JButton("<");
     backButton.setEnabled(false);
     backButton.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          //actionBack();
-          System.out.println("Back");
-        }
+      public void actionPerformed(ActionEvent e) {backAction();}
     });
 
-    JButton forwardButton = new JButton(">");
+    forwardButton = new JButton(">");
     forwardButton.setEnabled(false);
     forwardButton.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          //actionForward();
-          System.out.println("Forward");
-        }
+      public void actionPerformed(ActionEvent e) {forwardAction();}
     });
     buttonPanel.add(backButton);
     buttonPanel.add(forwardButton);
@@ -149,6 +140,39 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     frame.pack();
     frame.setLocationRelativeTo(null);
     frame.setVisible(true);
+
+
+    updatePage();
+  }
+
+  public void backAction() {
+    history_index -= 1;
+    String url = history.get(history_index);
+    System.out.println(history_index);
+    System.out.println(url);
+    addressBar.setText(url);
+    updatePage(false);
+  }
+
+  public void forwardAction() {
+    history_index += 1;
+    String url = history.get(history_index);
+    addressBar.setText(url);
+    updatePage(false);
+  }
+
+  public void activateNavButtons() {
+    if (history_index > 0) {
+      backButton.setEnabled(true);
+    } else {
+      backButton.setEnabled(false);
+    }
+
+    if (history_index < history.size()-1) {
+      forwardButton.setEnabled(true);
+    } else {
+      forwardButton.setEnabled(false);
+    }
   }
 
   public void setPageHanlder(String url) {
@@ -159,8 +183,6 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
       InputStreamReader reader = new InputStreamReader(in, "ISO-8859-1");
       kit.read(reader,doc,0);
       setDocument(doc);
-      history.add(webpage);
-      history_index += 1;
     } catch(IOException|BadLocationException e) {
       System.out.println(e);
       e.printStackTrace();
@@ -169,8 +191,17 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
   }
 
   public void updatePage() {
+    updatePage(true);
+  }
+
+  public void updatePage(Boolean addToHistory) {
      try {
       webpage = addressBar.getText();
+      if (addToHistory) {
+        history.add(webpage);
+        history_index += 1;
+      }
+      activateNavButtons();
       setPageHanlder(webpage);
       getHtml();
       getHrefLinks();
@@ -181,6 +212,9 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
   }
 
   public void actionPerformed(ActionEvent e) {
+    for (int i=0; i<(history.size()-1-history_index); i++) {
+      history.remove(history.size()-1);
+    }
     updatePage();
   }
 

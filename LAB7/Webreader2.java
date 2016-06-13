@@ -23,12 +23,12 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
   static String webpage;
   ArrayList<String> href, descr, history;
   int history_index = -1;
-  DefaultTableModel model;
-  JTable table;
+  MyTableModel model, bookmarkModel;
+  JTable table, bookmarkTable;
   JFrame frame;
   String html;
   HTMLEditorKit kit;
-  JButton forwardButton, backButton;
+  JButton forwardButton, backButton, bookmarkButton;
 
   public static void main(String[] args) {
     webpage = initalWebpage();
@@ -91,11 +91,17 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     frame.add(addressBar, BorderLayout.NORTH);
   }
 
-  public void buildTableModel() {
-    model = new DefaultTableModel();
-    table = new JTable(model);
-    model.addColumn("Webbadress");
-    model.addColumn("Beskrivning");
+  public JTable buildTableModel(String[] columns) {
+    MyTableModel tableModel = new MyTableModel();
+    JTable jTable = new JTable(tableModel);
+    for (String column : columns) {
+        tableModel.addColumn(column);
+    }
+    return jTable;
+  }
+
+  public void bookmarkAction() {
+    bookmarkModel.addRow(new Object[]{addressBar.getText()});
   }
 
   public Webreader2() {
@@ -105,10 +111,39 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     setContentType("text/html");
 
     buildFrame();
-    buildTableModel();
     addHyperlinkListener(this);
 
-    JPanel buttonPanel = new JPanel();
+    table = buildTableModel(new String[] {"Webbadress", "Beskrivning"});
+    model = (MyTableModel)(table.getModel());
+
+    bookmarkTable = buildTableModel(new String[] {"Bokmärkesnamn"});
+    bookmarkModel = (MyTableModel)(bookmarkTable.getModel());
+    bookmarkTable.getColumnModel().getColumn(0).setPreferredWidth(27);
+
+    bookmarkTable.addMouseListener(new java.awt.event.MouseAdapter() {
+      public void mouseClicked(java.awt.event.MouseEvent evt) {
+        int row = bookmarkTable.rowAtPoint(evt.getPoint());
+        int col = bookmarkTable.columnAtPoint(evt.getPoint());
+        if (row >= 0 && col >= 0) {
+          String clickedLink = (String)(bookmarkTable.getValueAt(row, col));
+          addressBar.setText(clickedLink);
+          clearForwardHistory();
+          updatePage();
+        }
+      }
+    });
+
+    JPanel fBButtonPanel = new JPanel();
+    JPanel masterButtonPanel = new JPanel();
+    masterButtonPanel.setLayout(new GridLayout(2,1));
+
+    bookmarkButton = new JButton("Bookmark");
+    bookmarkButton.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {bookmarkAction();}
+    });
+
+    masterButtonPanel.add(fBButtonPanel);
+    masterButtonPanel.add(bookmarkButton);
 
     backButton = new JButton("<");
     backButton.setEnabled(false);
@@ -121,19 +156,21 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     forwardButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {forwardAction();}
     });
-    buttonPanel.add(backButton);
-    buttonPanel.add(forwardButton);
-    buttonPanel.setLayout(new GridLayout());
+    fBButtonPanel.add(backButton);
+    fBButtonPanel.add(forwardButton);
+    fBButtonPanel.setLayout(new GridLayout());
 
     JPanel parentPanel = new JPanel(new BorderLayout());
     JScrollPane web = new JScrollPane(this);
     JScrollPane links = new JScrollPane(table);
+    JScrollPane bookmarkPane = new JScrollPane(bookmarkTable);
 
     Container cont = new Container();
     cont.add(web);
     cont.add(links);
+    cont.add(bookmarkPane);
     cont.setLayout(new GridLayout());
-    parentPanel.add(buttonPanel, BorderLayout.PAGE_START);
+    parentPanel.add(masterButtonPanel, BorderLayout.PAGE_START);
     parentPanel.add(cont, BorderLayout.CENTER);
 
     frame.add(parentPanel);
@@ -209,10 +246,16 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     }
   }
 
-  public void actionPerformed(ActionEvent e) {
+  public void clearForwardHistory() {
+    System.out.println("List length: " + history.size());
+    System.out.println("index: " + history_index);
     for (int i=0; i<(history.size()-1-history_index); i++) {
       history.remove(history.size()-1);
     }
+  }
+
+  public void actionPerformed(ActionEvent e) {
+    clearForwardHistory();
     updatePage();
   }
 

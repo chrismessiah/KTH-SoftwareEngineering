@@ -104,39 +104,17 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
   }
 
   public void bookmarkAction() {
-    bookmarkModel.addRow(new Object[]{addressBar.getText()});
-    sortBookmarkList();
+    bookmarkModel.addARow(addressBar.getText());
     bookmarkButtonDelete.setEnabled(true);
     writeBookMarksToFile();
   }
 
   public void deleteBookmarkAction() {
-    String toRemove = addressBar.getText();
-    int rows = bookmarkModel.getRowCount();
-    for (int i=0;i<rows;i++) {
-      if (((String)(bookmarkModel.getValueAt(i, 0))).equals(toRemove)) {
-        bookmarkModel.removeRow(i);
-        break;
-      }
-    }
+    bookmarkModel.deleteARow(addressBar.getText());
     if (bookmarkModel.getRowCount() == 0) {
       bookmarkButtonDelete.setEnabled(false);
     }
     writeBookMarksToFile();
-  }
-
-  public void sortBookmarkList() {
-    int rows = bookmarkModel.getRowCount();
-    if (rows > 1) {
-      String[] sortedBookmarks = new String[rows];
-      for (int i=0;i<rows;i++) {
-        sortedBookmarks[i] = (String)(bookmarkModel.getValueAt(i, 0));
-      }
-      Arrays.sort(sortedBookmarks);
-      for (int i=0;i<rows;i++) {
-        bookmarkModel.setValueAt(sortedBookmarks[i], i, 0);
-      }
-    }
   }
 
   public void bookmarkClick(MouseEvent e) {
@@ -164,7 +142,6 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
 
     bookmarkTable = buildTableModel(new String[] {"Bokmärkesnamn"}, true);
     bookmarkModel = (MyTableModel)(bookmarkTable.getModel());
-    bookmarkTable.getColumnModel().getColumn(0).setPreferredWidth(27);
     bookmarkTable.addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent e) {
         if ((SwingUtilities.isRightMouseButton(e))) {

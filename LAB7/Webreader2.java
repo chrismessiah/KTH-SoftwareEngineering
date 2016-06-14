@@ -30,6 +30,8 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
   String html;
   HTMLEditorKit kit;
   JButton forwardButton, backButton, bookmarkButton, bookmarkButtonDelete;
+  String bookmarkFilename = "bookmarks.txt";
+  String fileContent;
 
   public static void main(String[] args) {
     webpage = initalWebpage();
@@ -105,6 +107,7 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     bookmarkModel.addRow(new Object[]{addressBar.getText()});
     sortBookmarkList();
     bookmarkButtonDelete.setEnabled(true);
+    writeBookMarksToFile();
   }
 
   public void deleteBookmarkAction() {
@@ -119,6 +122,7 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     if (bookmarkModel.getRowCount() == 0) {
       bookmarkButtonDelete.setEnabled(false);
     }
+    writeBookMarksToFile();
   }
 
   public void sortBookmarkList() {
@@ -216,6 +220,8 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
 
     updatePage();
     //addBookmarks();
+    //writeBookMarksToFile();
+    readBookmarksFromFile();
   }
 
   public void backAction() {
@@ -307,10 +313,48 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     return "http://www.nada.kth.se/~henrik";
   }
 
-  public void addBookmarks() {
-    String[] bookmarksToAdd = new String[] {"http://www.nada.kth.se/~henrik","http://www.nada.kth.se/~ala", "http://www.nada.kth.se/~karlan","http://www.nada.kth.se/~viggo","http://www.nada.kth.se/~vahid","http://www.nada.kth.se/~johanh","http://www.nada.kth.se/~ann"};
-    for (String bookmark : bookmarksToAdd) {
-      bookmarkModel.addRow(new Object[]{bookmark});
+  public void readBookmarksFromFile() {
+    try {
+        File f = new File(bookmarkFilename);
+        if(!f.exists()) {f.createNewFile();} 
+        FileInputStream fis = new FileInputStream(f); 
+        InputStreamReader in = new InputStreamReader(fis, "UTF-8");
+        fileContent = "";
+        while(in.ready()) {
+           fileContent += String.valueOf((char)in.read());
+        }
+        if (!fileContent.equals("")) {
+          String[] bookmarks = fileContent.split(",");
+          for (String bookmark : bookmarks) {
+            if (bookmark != "") {
+              bookmarkModel.addRow(new Object[]{bookmark});
+            }
+          }
+          bookmarkButtonDelete.setEnabled(true);
+        }
+    } catch (IOException e) {
+      System.out.println(e);
     }
+  }
+
+  public void writeBookMarksToFile() {
+    try {
+      FileOutputStream fos = new FileOutputStream(bookmarkFilename); 
+      OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
+      int rows = bookmarkModel.getRowCount();
+      String stringToWrite = "";
+      if (rows > 0) {
+        for (int i=0;i<rows;i++) {
+          stringToWrite += (String)(bookmarkModel.getValueAt(i, 0)) + ",";
+        }
+      } else {
+        stringToWrite = ",";
+      }
+      out.write(stringToWrite, 0, stringToWrite.length());
+      out.flush();
+    } catch (IOException e) {
+      System.out.println(e);
+    }
+
   }
 }

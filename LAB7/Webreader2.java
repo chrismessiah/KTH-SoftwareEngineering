@@ -104,13 +104,13 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
   }
 
   public void bookmarkAction() {
-    bookmarkModel.addARow(addressBar.getText());
+    bookmarkModel.addBookmark(addressBar.getText());
     bookmarkButtonDelete.setEnabled(true);
     writeBookMarksToFile();
   }
 
   public void deleteBookmarkAction() {
-    bookmarkModel.deleteARow(addressBar.getText());
+    bookmarkModel.removeBookmark(addressBar.getText());
     if (bookmarkModel.getRowCount() == 0) {
       bookmarkButtonDelete.setEnabled(false);
     }

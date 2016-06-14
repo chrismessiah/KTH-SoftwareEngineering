@@ -94,8 +94,8 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     frame.add(addressBar, BorderLayout.NORTH);
   }
 
-  public JTable buildTableModel(String[] columns) {
-    MyTableModel tableModel = new MyTableModel();
+  public JTable buildTableModel(String[] columns, Boolean bool) {
+    MyTableModel tableModel = new MyTableModel(bool);
     JTable jTable = new JTable(tableModel);
     for (String column : columns) {
         tableModel.addColumn(column);
@@ -159,14 +159,22 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     buildFrame();
     addHyperlinkListener(this);
 
-    table = buildTableModel(new String[] {"Webbadress", "Beskrivning"});
+    table = buildTableModel(new String[] {"Webbadress", "Beskrivning"}, false);
     model = (MyTableModel)(table.getModel());
 
-    bookmarkTable = buildTableModel(new String[] {"Bokmärkesnamn"});
+    bookmarkTable = buildTableModel(new String[] {"Bokmärkesnamn"}, true);
     bookmarkModel = (MyTableModel)(bookmarkTable.getModel());
     bookmarkTable.getColumnModel().getColumn(0).setPreferredWidth(27);
     bookmarkTable.addMouseListener(new MouseAdapter() {
-      public void mouseClicked(MouseEvent e) {bookmarkClick(e);}
+      public void mouseClicked(MouseEvent e) {
+        if ((SwingUtilities.isRightMouseButton(e))) {
+          int row = bookmarkTable.rowAtPoint(e.getPoint());
+          int col = bookmarkTable.columnAtPoint(e.getPoint());
+          bookmarkTable.editCellAt(row, col);
+        } else {
+          bookmarkClick(e);
+        }
+      }
     });
 
     JPanel masterButtonPanel = new JPanel();
@@ -316,8 +324,8 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
   public void readBookmarksFromFile() {
     try {
         File f = new File(bookmarkFilename);
-        if(!f.exists()) {f.createNewFile();} 
-        FileInputStream fis = new FileInputStream(f); 
+        if(!f.exists()) {f.createNewFile();}
+        FileInputStream fis = new FileInputStream(f);
         InputStreamReader in = new InputStreamReader(fis, "UTF-8");
         fileContent = "";
         while(in.ready()) {
@@ -339,7 +347,7 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
 
   public void writeBookMarksToFile() {
     try {
-      FileOutputStream fos = new FileOutputStream(bookmarkFilename); 
+      FileOutputStream fos = new FileOutputStream(bookmarkFilename);
       OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
       int rows = bookmarkModel.getRowCount();
       String stringToWrite = "";

@@ -104,6 +104,17 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     bookmarkModel.addRow(new Object[]{addressBar.getText()});
   }
 
+  public void bookmarkClick(MouseEvent e) {
+    int row = bookmarkTable.rowAtPoint(e.getPoint());
+    int col = bookmarkTable.columnAtPoint(e.getPoint());
+    if (row >= 0 && col >= 0) {
+      String clickedLink = (String)(bookmarkTable.getValueAt(row, col));
+      addressBar.setText(clickedLink);
+      clearForwardHistory();
+      updatePage();
+    }
+  }
+
   public Webreader2() {
     history = new ArrayList<String>();
     kit = new HTMLEditorKit();
@@ -119,18 +130,8 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     bookmarkTable = buildTableModel(new String[] {"Bokmärkesnamn"});
     bookmarkModel = (MyTableModel)(bookmarkTable.getModel());
     bookmarkTable.getColumnModel().getColumn(0).setPreferredWidth(27);
-
-    bookmarkTable.addMouseListener(new java.awt.event.MouseAdapter() {
-      public void mouseClicked(java.awt.event.MouseEvent evt) {
-        int row = bookmarkTable.rowAtPoint(evt.getPoint());
-        int col = bookmarkTable.columnAtPoint(evt.getPoint());
-        if (row >= 0 && col >= 0) {
-          String clickedLink = (String)(bookmarkTable.getValueAt(row, col));
-          addressBar.setText(clickedLink);
-          clearForwardHistory();
-          updatePage();
-        }
-      }
+    bookmarkTable.addMouseListener(new MouseAdapter() {
+        public void mouseClicked(MouseEvent e) {bookmarkClick(e);}
     });
 
     JPanel fBButtonPanel = new JPanel();
@@ -141,6 +142,7 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     bookmarkButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {bookmarkAction();}
     });
+
 
     masterButtonPanel.add(fBButtonPanel);
     masterButtonPanel.add(bookmarkButton);
@@ -180,6 +182,7 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
 
 
     updatePage();
+    addBookmarks();
   }
 
   public void backAction() {
@@ -247,9 +250,8 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
   }
 
   public void clearForwardHistory() {
-    System.out.println("List length: " + history.size());
-    System.out.println("index: " + history_index);
-    for (int i=0; i<(history.size()-1-history_index); i++) {
+    int current_size = history.size();
+    for (int i=0; i<(current_size-1-history_index); i++) {
       history.remove(history.size()-1);
     }
   }
@@ -269,14 +271,13 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
   }
 
   public static String initalWebpage() {
-    String url;
-    //url = "http://www.nada.kth.se/~orjan";
-    //url = "http://www.nada.kth.se/~ala";
-    url = "http://www.nada.kth.se/~henrik";
-    //url = "http://www.nada.kth.se/~viggo";
-    //url = "http://www.nada.kth.se/~vahid";
-    //url = "http://www.nada.kth.se/~johanh";
-    //url = "http://www.nada.kth.se/~ann";
-    return url;
+    return "http://www.nada.kth.se/~henrik";
+  }
+
+  public void addBookmarks() {
+    String[] bookmarksToAdd = new String[] {"http://www.nada.kth.se/~henrik","http://www.nada.kth.se/~ala", "http://www.nada.kth.se/~karlan","http://www.nada.kth.se/~viggo","http://www.nada.kth.se/~vahid","http://www.nada.kth.se/~johanh","http://www.nada.kth.se/~ann"};
+    for (String bookmark : bookmarksToAdd) {
+      bookmarkModel.addRow(new Object[]{bookmark});
+    }
   }
 }

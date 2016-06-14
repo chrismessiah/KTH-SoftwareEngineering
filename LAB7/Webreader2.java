@@ -13,6 +13,7 @@ import javax.swing.event.*;
 import javax.swing.text.html.*;
 import javax.swing.text.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -28,7 +29,7 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
   JFrame frame;
   String html;
   HTMLEditorKit kit;
-  JButton forwardButton, backButton, bookmarkButton;
+  JButton forwardButton, backButton, bookmarkButton, bookmarkButtonDelete;
 
   public static void main(String[] args) {
     webpage = initalWebpage();
@@ -102,6 +103,36 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
 
   public void bookmarkAction() {
     bookmarkModel.addRow(new Object[]{addressBar.getText()});
+    sortBookmarkList();
+    bookmarkButtonDelete.setEnabled(true);
+  }
+
+  public void deleteBookmarkAction() {
+    String toRemove = addressBar.getText();
+    int rows = bookmarkModel.getRowCount();
+    for (int i=0;i<rows;i++) {
+      if (((String)(bookmarkModel.getValueAt(i, 0))).equals(toRemove)) {
+        bookmarkModel.removeRow(i);
+        break;
+      }
+    }
+    if (bookmarkModel.getRowCount() == 0) {
+      bookmarkButtonDelete.setEnabled(false);
+    }
+  }
+
+  public void sortBookmarkList() {
+    int rows = bookmarkModel.getRowCount();
+    if (rows > 1) {
+      String[] sortedBookmarks = new String[rows];
+      for (int i=0;i<rows;i++) {
+        sortedBookmarks[i] = (String)(bookmarkModel.getValueAt(i, 0));
+      }
+      Arrays.sort(sortedBookmarks);
+      for (int i=0;i<rows;i++) {
+        bookmarkModel.setValueAt(sortedBookmarks[i], i, 0);
+      }
+    }
   }
 
   public void bookmarkClick(MouseEvent e) {
@@ -131,21 +162,24 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     bookmarkModel = (MyTableModel)(bookmarkTable.getModel());
     bookmarkTable.getColumnModel().getColumn(0).setPreferredWidth(27);
     bookmarkTable.addMouseListener(new MouseAdapter() {
-        public void mouseClicked(MouseEvent e) {bookmarkClick(e);}
+      public void mouseClicked(MouseEvent e) {bookmarkClick(e);}
     });
 
-    JPanel fBButtonPanel = new JPanel();
     JPanel masterButtonPanel = new JPanel();
-    masterButtonPanel.setLayout(new GridLayout(2,1));
+    masterButtonPanel.setLayout(new GridLayout(2,2));
 
-    bookmarkButton = new JButton("Bookmark");
+    bookmarkButton = new JButton("Add Bookmark");
+    masterButtonPanel.add(bookmarkButton);
     bookmarkButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {bookmarkAction();}
     });
 
-
-    masterButtonPanel.add(fBButtonPanel);
-    masterButtonPanel.add(bookmarkButton);
+    bookmarkButtonDelete = new JButton("Delete Bookmark");
+    bookmarkButtonDelete.setEnabled(false);
+    masterButtonPanel.add(bookmarkButtonDelete);
+    bookmarkButtonDelete.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {deleteBookmarkAction();}
+    });
 
     backButton = new JButton("<");
     backButton.setEnabled(false);
@@ -158,9 +192,8 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     forwardButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {forwardAction();}
     });
-    fBButtonPanel.add(backButton);
-    fBButtonPanel.add(forwardButton);
-    fBButtonPanel.setLayout(new GridLayout());
+    masterButtonPanel.add(backButton);
+    masterButtonPanel.add(forwardButton);
 
     JPanel parentPanel = new JPanel(new BorderLayout());
     JScrollPane web = new JScrollPane(this);
@@ -182,7 +215,7 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
 
 
     updatePage();
-    addBookmarks();
+    //addBookmarks();
   }
 
   public void backAction() {

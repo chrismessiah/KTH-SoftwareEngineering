@@ -49,6 +49,7 @@ public class BookmarkModel extends DefaultTableModel {
 		names.remove(index);
 		links.remove(index);
 		deleteARow(name);
+		writeBookMarksToFile();
 	}
 
 	public boolean isCellEditable(int row, int column){
@@ -65,21 +66,17 @@ public class BookmarkModel extends DefaultTableModel {
 	}
 
 	public void sortAlpha(){
-		int length = names.size();
-		int[] indexList = new int[length];
 		ArrayList<String> namesNewList = new ArrayList<String>(names);
 		ArrayList<String> linksNewList = new ArrayList<String>();
 		Collections.sort(namesNewList);
+		int length = names.size();
 		for (int i=0;i<length;i++) {
-			indexList[i] = namesNewList.indexOf(names.get(i));
+			int oldIndex = names.indexOf(namesNewList.get(i));
+			linksNewList.add(links.get(oldIndex));
 		}
-		for (int i=0;i<length;i++) {
-			linksNewList.add( links.get(indexList[i]) );
-		}
+
 		links = linksNewList;
 		names = namesNewList;
-		// has to be rewritten to handle the arraylists
-
 		int rows = getRowCount();
 		if (rows > 1) {
 			String[] sortedBookmarks = new String[rows];

@@ -24,13 +24,13 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
   static String webpage;
   ArrayList<String> href, descr, history;
   int history_index = -1;
-  MyTableModel model, bookmarkModel;
+  BookmarkModel bookmarkModel;
+  MyOwnModel model;
   JTable table, bookmarkTable;
   JFrame frame;
   String html;
   HTMLEditorKit kit;
   JButton forwardButton, backButton, bookmarkButton, bookmarkButtonDelete;
-  String bookmarkFilename = "bookmarks.txt";
   String fileContent;
 
   public static void main(String[] args) {
@@ -94,19 +94,20 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     frame.add(addressBar, BorderLayout.NORTH);
   }
 
-  public JTable buildTableModel(String[] columns, Boolean bool) {
-    MyTableModel tableModel = new MyTableModel(bool);
-    JTable jTable = new JTable(tableModel);
-    for (String column : columns) {
-        tableModel.addColumn(column);
+  public JTable buildTableModel(String[] columns, Boolean isBookmarkModel, Boolean isEditable) {
+    DefaultTableModel tableModel;
+    if (isBookmarkModel) {
+      tableModel = new BookmarkModel(isEditable, columns);
+    } else {
+      tableModel = new MyOwnModel(columns);
     }
+    JTable jTable = new JTable(tableModel);
     return jTable;
   }
 
   public void bookmarkAction() {
     bookmarkModel.addBookmark(addressBar.getText());
     bookmarkButtonDelete.setEnabled(true);
-    writeBookMarksToFile();
   }
 
   public void deleteBookmarkAction() {
@@ -114,14 +115,14 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     if (bookmarkModel.getRowCount() == 0) {
       bookmarkButtonDelete.setEnabled(false);
     }
-    writeBookMarksToFile();
   }
 
   public void bookmarkClick(MouseEvent e) {
     int row = bookmarkTable.rowAtPoint(e.getPoint());
     int col = bookmarkTable.columnAtPoint(e.getPoint());
     if (row >= 0 && col >= 0) {
-      String clickedLink = (String)(bookmarkTable.getValueAt(row, col));
+      String clickedString = (String)(bookmarkTable.getValueAt(row, col));
+      String clickedLink = bookmarkModel.getLinkByName(clickedString);
       addressBar.setText(clickedLink);
       clearForwardHistory();
       updatePage();
@@ -137,11 +138,11 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     buildFrame();
     addHyperlinkListener(this);
 
-    table = buildTableModel(new String[] {"Webbadress", "Beskrivning"}, false);
-    model = (MyTableModel)(table.getModel());
+    table = buildTableModel(new String[] {"Webbadress", "Beskrivning"}, false, false);
+    model = (MyOwnModel)(table.getModel());
 
-    bookmarkTable = buildTableModel(new String[] {"Bokmärkesnamn"}, true);
-    bookmarkModel = (MyTableModel)(bookmarkTable.getModel());
+    bookmarkTable = buildTableModel(new String[] {"Bokmärkesnamn"}, true, true);
+    bookmarkModel = (BookmarkModel)(bookmarkTable.getModel());
     bookmarkTable.addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent e) {
         if ((SwingUtilities.isRightMouseButton(e))) {
@@ -164,7 +165,11 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     });
 
     bookmarkButtonDelete = new JButton("Delete Bookmark");
-    bookmarkButtonDelete.setEnabled(false);
+    if (bookmarkModel.getRowCount() == 0) {
+      bookmarkButtonDelete.setEnabled(false);
+    } else {
+      bookmarkButtonDelete.setEnabled(true);
+    }
     masterButtonPanel.add(bookmarkButtonDelete);
     bookmarkButtonDelete.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {deleteBookmarkAction();}
@@ -206,7 +211,6 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     updatePage();
     //addBookmarks();
     //writeBookMarksToFile();
-    readBookmarksFromFile();
   }
 
   public void backAction() {
@@ -298,48 +302,4 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     return "http://www.nada.kth.se/~henrik";
   }
 
-  public void readBookmarksFromFile() {
-    try {
-        File f = new File(bookmarkFilename);
-        if(!f.exists()) {f.createNewFile();}
-        FileInputStream fis = new FileInputStream(f);
-        InputStreamReader in = new InputStreamReader(fis, "UTF-8");
-        fileContent = "";
-        while(in.ready()) {
-           fileContent += String.valueOf((char)in.read());
-        }
-        if (!fileContent.equals("")) {
-          String[] bookmarks = fileContent.split(",");
-          for (String bookmark : bookmarks) {
-            if (bookmark != "") {
-              bookmarkModel.addRow(new Object[]{bookmark});
-            }
-          }
-          bookmarkButtonDelete.setEnabled(true);
-        }
-    } catch (IOException e) {
-      System.out.println(e);
-    }
-  }
-
-  public void writeBookMarksToFile() {
-    try {
-      FileOutputStream fos = new FileOutputStream(bookmarkFilename);
-      OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
-      int rows = bookmarkModel.getRowCount();
-      String stringToWrite = "";
-      if (rows > 0) {
-        for (int i=0;i<rows;i++) {
-          stringToWrite += (String)(bookmarkModel.getValueAt(i, 0)) + ",";
-        }
-      } else {
-        stringToWrite = ",";
-      }
-      out.write(stringToWrite, 0, stringToWrite.length());
-      out.flush();
-    } catch (IOException e) {
-      System.out.println(e);
-    }
-
-  }
 }

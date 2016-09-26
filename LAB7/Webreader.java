@@ -78,7 +78,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setPreferredSize(new Dimension(800,600));
-    frame.setTitle("LAB6");
+    frame.setTitle("LAB7");
     addressBar = new JTextField();
     addressBar.addActionListener(this);
     addressBar.setText(webpage);

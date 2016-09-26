@@ -68,26 +68,23 @@ public class BookmarkModel extends DefaultTableModel {
 	public void sortAlpha(){
 		ArrayList<String> namesNewList = new ArrayList<String>(names);
 		ArrayList<String> linksNewList = new ArrayList<String>();
-		Collections.sort(namesNewList);
+		Collections.sort(namesNewList, String.CASE_INSENSITIVE_ORDER);
+				
 		int length = names.size();
 		for (int i=0;i<length;i++) {
 			int oldIndex = names.indexOf(namesNewList.get(i));
 			linksNewList.add(links.get(oldIndex));
 		}
 
-		links = linksNewList;
-		names = namesNewList;
 		int rows = getRowCount();
 		if (rows > 1) {
-			String[] sortedBookmarks = new String[rows];
-			for (int i=0;i<rows;i++) {
-				sortedBookmarks[i] = (String)(getValueAt(i, 0));
-			}
-			Arrays.sort(sortedBookmarks);
-			for (int i=0;i<rows;i++) {
-				super.setValueAt(sortedBookmarks[i], i, 0);
+			for (int i=0;i<linksNewList.size();i++) {
+				super.setValueAt(namesNewList.get(i), i, 0);
 			}
 		}
+		
+		links = linksNewList;
+		names = namesNewList;
 	}
 
 	private void deleteARow(String str){

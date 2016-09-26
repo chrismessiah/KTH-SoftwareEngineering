@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 public class Webreader extends JEditorPane implements ActionListener, HyperlinkListener {
 
+  boolean showedError;
   JTextField addressBar;
   static String webpage;
   ArrayList<String> href, descr;
@@ -35,6 +36,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     JPanel parentPanel = new JPanel(new BorderLayout());
     JScrollPane web = new JScrollPane(this);
     JScrollPane links = new JScrollPane(table);
+    showedError = false;
 
     Container cont = new Container();
     cont.add(web);
@@ -51,6 +53,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
   }
   
   public void updatePage() {
+    showedError = false;
     try {
       webpage = addressBar.getText();
       getHrefLinks(webpage);
@@ -86,7 +89,8 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
         } else {break;}
       }
     } catch (Exception e) {
-      System.out.println(e);
+      showErrorPopup("BAD URL: " + webpage);
+      //System.out.println(e);
     }
   }
   
@@ -118,23 +122,19 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     model.addColumn("Beskrivning");
   }
 
-  public void errorMessage() {
-    setContentType("text/html");
-    HTMLEditorKit kit = new HTMLEditorKit();
-    setEditorKit(kit);
-    Document doc = kit.createDefaultDocument();
-    setDocument(doc);
-    String htmlString = "<html><body><h1>Bad URL!</h1></body></html>";
-    setText(htmlString);
-  }
-
   public void setPageHanlder(String url) {
     try {
       setPage(url);
-    } catch (IOException e) {
-      // JOptionPane
-      // show message dialoh
-      addressBar.setText("ERROR BAD URL");
+    } catch (Exception e) {
+      showErrorPopup("BAD URL: " + url);
+    }
+  }
+  
+  public void showErrorPopup(String message) {
+    if (!showedError) {
+      showedError = true;
+      JOptionPane dialog = new JOptionPane();
+      dialog.showMessageDialog(this, "Error: " + message);
     }
   }
 

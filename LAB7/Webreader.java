@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 public class Webreader extends JEditorPane implements ActionListener, HyperlinkListener {
 
+  boolean showedError;
   JTextField addressBar;
   static String webpage;
   ArrayList<String> href, descr, history;
@@ -57,7 +58,8 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
         } else {break;}
       }
     } catch (Exception e) {
-      System.out.println(e);
+      //System.out.println(e);
+      showErrorPopup("BAD URL: " + webpage);
     }
   }
   
@@ -126,6 +128,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
 
     buildFrame();
     addHyperlinkListener(this);
+    showedError = false;
 
     table = buildTableModel(new String[] {"Webbadress", "Beskrivning"}, false, false);
     model = (MyOwnModel)(table.getModel());
@@ -236,7 +239,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     } catch(Exception e) {
       //System.out.println(e);
       //e.printStackTrace();
-      addressBar.setText("ERROR BAD URL");
+      showErrorPopup("BAD URL: " + url);
     }
   }
 
@@ -245,15 +248,19 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
   }
 
   public void updatePage(Boolean addToHistory) {
+    showedError = false;
      try {
       webpage = addressBar.getText();
-      if (addToHistory) {
-        history.add(webpage);
-        history_index += 1;
-      }
       activateNavButtons();
       setPageHanlder(webpage);
       getHrefLinks();
+      
+      if (addToHistory && !showedError) {
+        history.add(webpage);
+        history_index += 1;
+        activateNavButtons();
+      }
+      
       updateTableModel();
     } catch (Throwable t) {
       //t.printStackTrace();
@@ -280,6 +287,14 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
       updatePage();
     }
     clearForwardHistory();
+  }
+
+  public void showErrorPopup(String message) {
+    if (!showedError) {
+      showedError = true;
+      JOptionPane dialog = new JOptionPane();
+      dialog.showMessageDialog(this, "Error: " + message);
+    }
   }
 
   public static String initalWebpage() {

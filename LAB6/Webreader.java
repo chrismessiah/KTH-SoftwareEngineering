@@ -26,7 +26,12 @@ public class Webreader extends JEditorPane implements ActionListener {
   public void getHrefLinks(String url) {
     try {
       InputStream in = new URL(url).openConnection().getInputStream();
-      InputStreamReader reader = new InputStreamReader(in, "ISO-8859-1");
+      InputStreamReader reader = new InputStreamReader(in);
+      //InputStreamReader reader = new InputStreamReader(in, "ISO-8859-1");
+      HTMLDocument htmlDoc = new HTMLDocument();
+      htmlDoc.putProperty("IgnoreCharsetDirective", Boolean.TRUE);
+      new HTMLEditorKit().read(reader,htmlDoc,0); 
+      
       String html = "";
       while(reader.ready()) {
          html += String.valueOf((char)reader.read());
@@ -122,6 +127,8 @@ public class Webreader extends JEditorPane implements ActionListener {
     try {
       setPage(url);
     } catch (IOException e) {
+      // JOptionPane
+      // show message dialoh
       addressBar.setText("ERROR BAD URL");
     }
   }

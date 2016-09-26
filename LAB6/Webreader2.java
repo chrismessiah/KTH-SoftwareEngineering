@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import java.util.Arrays;
 
 public class Webreader2 extends JEditorPane implements ActionListener, HyperlinkListener {
 
@@ -34,6 +35,7 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
   }
 
   public void getHtml() {
+    System.out.println("getHtml running");
     try {
       InputStream in = new URL(webpage).openConnection().getInputStream();
       InputStreamReader reader = new InputStreamReader(in, "ISO-8859-1");
@@ -41,31 +43,43 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
       while(reader.ready()) {
          html += String.valueOf((char)reader.read());
       }
+      System.out.println("html");
+      System.out.println(html);
     } catch (IOException e) {
-      //System.out.println(e);
+      System.out.println("ERROR");
+      System.out.println(e);
     }
   }
 
   public void getHrefLinks() {
+    System.out.println("RAN");
     String trimmedHtml = html.replaceAll("\n","");
+    System.out.println(trimmedHtml);
     href = new ArrayList<String>();
     descr = new ArrayList<String>();
     String[] lines = trimmedHtml.split("<");
     String[] subLines;
     for (String line : lines) {
       if (line.length() > 5) {
-        if (line.substring(0,6).equals("A HREF")) {
+        if (line.substring(0,6).equals("A HREF") || line.substring(0,6).equals("a href")) {
           subLines = line.split(">");
           String textUrl = subLines[0].substring(8, subLines[0].length()-1);
-          href.add(textUrl);
-          if (subLines.length > 1) {
-            descr.add(subLines[1].trim());
-          } else {
-            descr.add("");
+          if (href.size() < 50) {
+            href.add(textUrl);
+            if (subLines.length > 1) {
+              descr.add(subLines[1].trim());
+            } else {
+              descr.add("");
+            }
           }
         }
       }
     }
+    System.out.println("HREF");
+    System.out.println(Arrays.toString(href.toArray()));
+    System.out.println("descr");
+    System.out.println(Arrays.toString(descr.toArray()));
+    
   }
 
   public void updateTableModel() {
@@ -148,7 +162,7 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
       getHrefLinks();
       updateTableModel();
     } catch (Throwable t) {
-      //t.printStackTrace();
+      t.printStackTrace();
     }
   }
 

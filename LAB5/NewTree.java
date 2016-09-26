@@ -24,6 +24,17 @@ class NewTree extends TreeFrame {
 		doc = getDoc();
 		new NewTree();
 	}
+	
+	// overrides method in TreeFrame, will run after constructor
+	// Key variables, root, treeModel, tree inheirited from TreeFrame
+	public void initTree() {
+		rootXML = doc.getDocumentElement();
+		String rootNodeName = getNodeAttributeValue(rootXML); // for the folder-name
+		root = new DefaultMutableTreeNode(rootNodeName);
+		treeModel = new DefaultTreeModel(root);
+		tree = new JTree(treeModel);
+		recursiveBuildUp(rootXML, root);
+	}
 
 	public static String getFilePath(String[] fileStr) {
 		String filePath = "";
@@ -56,17 +67,20 @@ class NewTree extends TreeFrame {
 		return nodeAttribute.getNodeValue();
 	}
 
+	// Depth-first recursive build up of child nodes
 	public void recursiveBuildUp(Node node, DefaultMutableTreeNode nodeTree) {
-		if (node.hasChildNodes()) {
-			NodeList childList = node.getChildNodes();
-			for (int i = 0; i < childList.getLength(); i++) {
-				Node childNode = childList.item(i);
-				// if (childNode.getNodeType() == Node.TEXT_NODE) {
-				// 	System.out.println(childNode.getNodeValue());
-				// }
+		if (node.hasChildNodes()) { // check if node is non-leaf
+			NodeList childList = node.getChildNodes(); // get child-nodes as list
+			for (int i = 0; i < childList.getLength(); i++) { // loop through all nodes
+				Node childNode = childList.item(i); // get child from list
+				
+				// check if node is an XML-element, and not anything else
+				// https://docs.oracle.com/javase/7/docs/api/org/w3c/dom/Node.html
+				// http://www.w3schools.com/xml/dom_nodes.asp
+				//
+				// then add the node to the tree and keep go deeper
 				if (childNode.getNodeType() == Node.ELEMENT_NODE) {
 					String childName = getNodeAttributeValue(childNode);
-					//System.out.println(childName);
 					DefaultMutableTreeNode childTree = new DefaultMutableTreeNode(childName);
 					nodeTree.add(childTree);
 					recursiveBuildUp(childNode, childTree);
@@ -74,7 +88,8 @@ class NewTree extends TreeFrame {
 			}
 		}
 	}
-
+	
+	// returns content of leafs, TEXT_NODE's counted as childs of the leafs
 	public String getTextContentOfNode(Node node) {
 		if (node.hasChildNodes()) {
 			NodeList childList = node.getChildNodes();
@@ -86,6 +101,7 @@ class NewTree extends TreeFrame {
 		return null;
 	}
 
+	// used when displaing details, will run for each element in path
 	public Node findChildByAttribute(Node parentNode, String attr) {
 		if (parentNode.hasChildNodes()) {
 			NodeList childList = parentNode.getChildNodes();
@@ -94,7 +110,6 @@ class NewTree extends TreeFrame {
 				if (childNode.getNodeType() == Node.ELEMENT_NODE) {
 					String childAttr = getNodeAttributeValue(childNode);
 					if (childAttr.equals(attr)) {
-						//System.out.println(childAttr);
 						return childNode;
 					}
 				}
@@ -103,18 +118,8 @@ class NewTree extends TreeFrame {
 		return null;
 	}
 
-	// should create root, treeModel and tree.
-  public void initTree() {
-		rootXML = doc.getDocumentElement();
-		String rootView = getNodeAttributeValue(rootXML);
-		root = new DefaultMutableTreeNode(rootView);
-		treeModel = new DefaultTreeModel(root);
-		tree = new JTree(treeModel);
-		recursiveBuildUp(rootXML, root);
-  }
-
 	void showDetails(TreePath p){
-		if (p == null) {return;}
+		if (p == null) {return;} // as made in TreeFrame
 		Node node = rootXML;
 		Object[] pathArray = p.getPath();
 		for (int i=1;i<pathArray.length; i++) {

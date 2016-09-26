@@ -51,7 +51,7 @@ public class Webreader extends JEditorPane implements ActionListener {
         }
       }
     } catch (IOException e) {
-      System.out.println(e);
+      //System.out.println(e);
     }
   }
 

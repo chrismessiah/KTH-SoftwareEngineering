@@ -148,7 +148,7 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
       getHrefLinks();
       updateTableModel();
     } catch (Throwable t) {
-      t.printStackTrace();
+      //t.printStackTrace();
     }
   }
 

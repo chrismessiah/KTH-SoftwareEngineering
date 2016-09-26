@@ -133,7 +133,7 @@ public class Webreader extends JEditorPane implements ActionListener {
       setPageHanlder(webpage);
       updateModel();
     } catch (Throwable t) {
-      t.printStackTrace();
+      //t.printStackTrace();
     }
   }
 

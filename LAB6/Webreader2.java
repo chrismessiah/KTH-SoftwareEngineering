@@ -42,7 +42,7 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
          html += String.valueOf((char)reader.read());
       }
     } catch (IOException e) {
-      System.out.println(e);
+      //System.out.println(e);
     }
   }
 
@@ -134,8 +134,8 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
       kit.read(reader,doc,0);
       setDocument(doc);
     } catch(IOException|BadLocationException e) {
-      System.out.println(e);
-      e.printStackTrace();
+      //System.out.println(e);
+      //e.printStackTrace();
       addressBar.setText("ERROR BAD URL");
     }
   }

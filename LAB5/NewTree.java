@@ -3,6 +3,8 @@
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.io.*;
+import java.awt.*;
+import java.awt.event.*;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -117,6 +119,14 @@ class NewTree extends TreeFrame {
 		}
 		return null;
 	}
+	
+	// for quitting program
+	public void actionPerformed(ActionEvent e) {
+		String cmd = e.getActionCommand();
+		if (cmd.equals(closeString))
+			dispose();
+			System.exit(0);
+	}
 
 	void showDetails(TreePath p){
 		if (p == null) {return;} // as made in TreeFrame
@@ -126,7 +136,7 @@ class NewTree extends TreeFrame {
 			String name = pathArray[i].toString();
 			node = findChildByAttribute(node, name);
 		}
-		String out = node.getNodeName() + ": " + getTextContentOfNode(node);
+		String out = node.getNodeName() + ": " + getNodeAttributeValue(node) + " " + getTextContentOfNode(node);
 		JOptionPane.showMessageDialog(this, out);
 	}
 

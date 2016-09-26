@@ -1,9 +1,3 @@
-//
-//  Diffrence to Webreader.java
-//  This method uses "HTMLEditorKit().read(reader,doc,0);" to display the html
-//  however it breaks relative image-paths, preventing them from rendering
-//  On the other hand it handles åäö-chars fine.
-
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -12,13 +6,13 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.html.*;
 import javax.swing.text.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import java.util.Arrays;
+import java.util.ArrayList;
 
-public class Webreader2 extends JEditorPane implements ActionListener, HyperlinkListener {
+public class Webreader extends JEditorPane implements ActionListener, HyperlinkListener {
 
   JTextField addressBar;
   static String webpage;
@@ -35,43 +29,38 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
 
   public static void main(String[] args) {
     webpage = initalWebpage();
-    Webreader2 obj = new Webreader2();
-  }
-
-  public void getHtml() {
-    try {
-      InputStream in = new URL(webpage).openConnection().getInputStream();
-      InputStreamReader reader = new InputStreamReader(in, "ISO-8859-1");
-      html = "";
-      while(reader.ready()) {
-         html += String.valueOf((char)reader.read());
-      }
-    } catch (IOException e) {
-      //System.out.println(e);
-    }
+    Webreader obj = new Webreader();
   }
 
   public void getHrefLinks() {
-    String trimmedHtml = html.replaceAll("\n","");
-    href = new ArrayList<String>();
-    descr = new ArrayList<String>();
-    String[] lines = trimmedHtml.split("<");
-    String[] subLines;
-    for (String line : lines) {
-      if (line.length() > 5) {
-        if (line.substring(0,6).equals("A HREF")) {
-          subLines = line.split(">");
-          String textUrl = subLines[0].substring(8, subLines[0].length()-1);
-          href.add(textUrl);
-          if (subLines.length > 1) {
-            descr.add(subLines[1].trim());
-          } else {
-            descr.add("");
-          }
-        }
+    try {
+      InputStream in = new URL(webpage).openConnection().getInputStream();
+      InputStreamReader reader = new InputStreamReader(in, "ISO-8859-1");
+      
+      HTMLDocument doc = new HTMLDocument();
+      doc.putProperty("IgnoreCharsetDirective", Boolean.TRUE);
+      new HTMLEditorKit().read(reader,doc,0);	//puts the website html in a document	
+      
+      href = new ArrayList<String>();
+      descr = new ArrayList<String>();
+      
+      for (HTMLDocument.Iterator iter = doc.getIterator(HTML.Tag.A); iter.isValid(); iter.next()) {
+        String elementAttribute = (String) iter.getAttributes().getAttribute(HTML.Attribute.HREF); 
+
+        int firstCharPos = iter.getStartOffset();
+        int lastCharPos = iter.getEndOffset();
+        String elementContent = doc.getText(firstCharPos, lastCharPos-firstCharPos);
+
+        if (href.size() < 50) {
+          href.add(elementAttribute);
+          descr.add(elementContent);  
+        } else {break;}
       }
+    } catch (Exception e) {
+      System.out.println(e);
     }
   }
+  
 
   public void updateTableModel() {
     int rows = model.getRowCount();
@@ -129,11 +118,11 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
     }
   }
 
-  public Webreader2() {
+  public Webreader() {
     history = new ArrayList<String>();
     kit = new HTMLEditorKit();
     setEditable(false);
-    setContentType("text/html");
+    //setContentType("text/html");
 
     buildFrame();
     addHyperlinkListener(this);
@@ -243,13 +232,8 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
 
   public void setPageHanlder(String url) {
     try {
-      Document doc = kit.createDefaultDocument();
-      doc.putProperty("IgnoreCharsetDirective", new Boolean(true));
-      InputStream in = new URL(webpage).openConnection().getInputStream();
-      InputStreamReader reader = new InputStreamReader(in, "ISO-8859-1");
-      kit.read(reader,doc,0);
-      setDocument(doc);
-    } catch(IOException|BadLocationException e) {
+      setPage(url);
+    } catch(Exception e) {
       //System.out.println(e);
       //e.printStackTrace();
       addressBar.setText("ERROR BAD URL");
@@ -269,7 +253,6 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
       }
       activateNavButtons();
       setPageHanlder(webpage);
-      getHtml();
       getHrefLinks();
       updateTableModel();
     } catch (Throwable t) {

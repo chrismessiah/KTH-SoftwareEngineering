@@ -6,10 +6,13 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.html.*;
 import javax.swing.text.*;
-import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import java.util.Arrays;
+import java.util.ArrayList;
 
-public class Webreader extends JEditorPane implements ActionListener {
+public class Webreader extends JEditorPane implements ActionListener, HyperlinkListener {
 
   JTextField addressBar;
   static String webpage;
@@ -22,44 +25,71 @@ public class Webreader extends JEditorPane implements ActionListener {
     webpage = initalWebpage();
     Webreader obj = new Webreader();
   }
+  
+  public Webreader() {
+    setEditable(false);
+    buildFrame();
+    buildModel();
+    addHyperlinkListener(this);
 
-  public void getHrefLinks(String url) {
+    JPanel parentPanel = new JPanel(new BorderLayout());
+    JScrollPane web = new JScrollPane(this);
+    JScrollPane links = new JScrollPane(table);
+
+    Container cont = new Container();
+    cont.add(web);
+    cont.add(links);
+    cont.setLayout(new GridLayout());
+    parentPanel.add(cont);
+
+    frame.add(parentPanel);
+    frame.pack();
+    frame.setLocationRelativeTo(null);
+    frame.setVisible(true);
+    
+    updatePage();
+  }
+  
+  public void updatePage() {
     try {
-      InputStream in = new URL(url).openConnection().getInputStream();
-      InputStreamReader reader = new InputStreamReader(in);
-      //InputStreamReader reader = new InputStreamReader(in, "ISO-8859-1");
-      HTMLDocument htmlDoc = new HTMLDocument();
-      htmlDoc.putProperty("IgnoreCharsetDirective", Boolean.TRUE);
-      new HTMLEditorKit().read(reader,htmlDoc,0); 
-      
-      String html = "";
-      while(reader.ready()) {
-         html += String.valueOf((char)reader.read());
-      }
-      String trimmedHtml = html.replaceAll("\n","");
-      href = new ArrayList<String>();
-      descr = new ArrayList<String>();
-      String[] lines = trimmedHtml.split("<");
-      String[] subLines;
-      for (String line : lines) {
-        if (line.length() > 5) {
-          if (line.substring(0,6).equals("A HREF")) {
-            subLines = line.split(">");
-            String textUrl = subLines[0].substring(8, subLines[0].length()-1);
-            href.add(textUrl);
-            if (subLines.length > 1) {
-              descr.add(subLines[1].trim());
-            } else {
-              descr.add("");
-            }
-          }
-        }
-      }
-    } catch (IOException e) {
-      //System.out.println(e);
+      webpage = addressBar.getText();
+      getHrefLinks(webpage);
+      setPageHanlder(webpage);
+      updateModel();
+    } catch (Throwable t) {
+      //t.printStackTrace();
     }
   }
 
+  public void getHrefLinks(String webpage) {
+    try {
+      InputStream in = new URL(webpage).openConnection().getInputStream();
+      InputStreamReader reader = new InputStreamReader(in, "ISO-8859-1");
+      
+      HTMLDocument doc = new HTMLDocument();
+      doc.putProperty("IgnoreCharsetDirective", Boolean.TRUE);
+      new HTMLEditorKit().read(reader,doc,0);	//puts the website html in a document	
+      
+      href = new ArrayList<String>();
+      descr = new ArrayList<String>();
+      
+      for (HTMLDocument.Iterator iter = doc.getIterator(HTML.Tag.A); iter.isValid(); iter.next()) {
+        String elementAttribute = (String) iter.getAttributes().getAttribute(HTML.Attribute.HREF); 
+
+        int firstCharPos = iter.getStartOffset();
+        int lastCharPos = iter.getEndOffset();
+        String elementContent = doc.getText(firstCharPos, lastCharPos-firstCharPos);
+
+        if (href.size() < 50) {
+          href.add(elementAttribute);
+          descr.add(elementContent);  
+        } else {break;}
+      }
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+  }
+  
   public void updateModel() {
     int rows = model.getRowCount();
     for (int i=0;i<rows;i++) {
@@ -98,31 +128,6 @@ public class Webreader extends JEditorPane implements ActionListener {
     setText(htmlString);
   }
 
-  public Webreader() {
-    setEditable(false);
-
-    setPageHanlder(webpage);
-    getHrefLinks(webpage);
-    buildFrame();
-    buildModel();
-    updateModel();
-
-    JPanel parentPanel = new JPanel(new BorderLayout());
-    JScrollPane web = new JScrollPane(this);
-    JScrollPane links = new JScrollPane(table);
-
-    Container cont = new Container();
-    cont.add(web);
-    cont.add(links);
-    cont.setLayout(new GridLayout());
-    parentPanel.add(cont);
-
-    frame.add(parentPanel);
-    frame.pack();
-    frame.setLocationRelativeTo(null);
-    frame.setVisible(true);
-  }
-
   public void setPageHanlder(String url) {
     try {
       setPage(url);
@@ -134,14 +139,7 @@ public class Webreader extends JEditorPane implements ActionListener {
   }
 
   public void actionPerformed(ActionEvent e) {
-    try {
-      webpage = addressBar.getText();
-      getHrefLinks(webpage);
-      setPageHanlder(webpage);
-      updateModel();
-    } catch (Throwable t) {
-      //t.printStackTrace();
-    }
+    updatePage();
   }
 
   public static String initalWebpage() {
@@ -154,5 +152,14 @@ public class Webreader extends JEditorPane implements ActionListener {
     //url = "http://www.nada.kth.se/~johanh";
     //url = "http://www.nada.kth.se/~ann";
     return url;
+  }
+  
+  public void hyperlinkUpdate(HyperlinkEvent e) {
+    HyperlinkEvent.EventType eventType = e.getEventType();
+    if (eventType == HyperlinkEvent.EventType.ACTIVATED) {
+      String url = e.getURL().toString();
+      addressBar.setText(url);
+      updatePage();
+    }
   }
 }

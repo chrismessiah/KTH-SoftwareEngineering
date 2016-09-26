@@ -296,6 +296,7 @@ public class Webreader2 extends JEditorPane implements ActionListener, Hyperlink
       addressBar.setText(url);
       updatePage();
     }
+    clearForwardHistory();
   }
 
   public static String initalWebpage() {

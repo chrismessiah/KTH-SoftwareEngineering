@@ -12,6 +12,16 @@ import javax.swing.event.HyperlinkListener;
 import java.util.Arrays;
 import java.util.ArrayList;
 
+// Websites that might be useable
+//
+// http://www.nada.kth.se/~orjan
+// http://www.nada.kth.se/~ala
+// http://www.nada.kth.se/~henrik
+// http://www.nada.kth.se/~viggo
+// http://www.nada.kth.se/~vahid
+// http://www.nada.kth.se/~johanh
+// http://www.nada.kth.se/~ann
+
 public class Webreader extends JEditorPane implements ActionListener, HyperlinkListener {
 
   boolean showedError;
@@ -25,14 +35,16 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
   JFrame frame;
   String html;
   HTMLEditorKit kit;
-  JButton forwardButton, backButton, bookmarkButton, bookmarkButtonDelete;
+  JButton forwardButton, backButton, addBookmarkButton, deleteBookmarkButton;
   String fileContent;
 
   public static void main(String[] args) {
-    webpage = initalWebpage();
+    webpage = "http://www.nada.kth.se/~henrik";
     Webreader obj = new Webreader();
   }
 
+  // stores the a-href attributes and content
+  // in the global ArrayLists
   public void getHrefLinks() {
     try {
       InputStream in = new URL(webpage).openConnection().getInputStream();
@@ -63,8 +75,9 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     }
   }
   
-
-  public void updateTableModel() {
+  // updates the model of the link table
+  // displayed in the frame.
+  public void updateLinkTableModel() {
     int rows = model.getRowCount();
     for (int i=0;i<rows;i++) {
       model.removeRow(0);
@@ -74,6 +87,8 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     }
   }
 
+  // used once in beginning of run
+  // to create browser-frame
   public void buildFrame() {
     frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -85,7 +100,8 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     frame.add(addressBar, BorderLayout.NORTH);
   }
 
-  public JTable buildTableModel(String[] columns, Boolean isBookmarkModel, Boolean isEditable) {
+  // a general table creator used for both urls and bookmarks
+  public JTable buildTable(String[] columns, Boolean isBookmarkModel, Boolean isEditable) {
     DefaultTableModel tableModel;
     if (isBookmarkModel) {
       tableModel = new BookmarkModel(isEditable, columns);
@@ -96,27 +112,40 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     return jTable;
   }
 
-  public void bookmarkAction() {
+  // Action: click on add-bookmark button
+  // will run methods on BookmarkModel class
+  public void addBookmarkAction() {
     bookmarkModel.addBookmark(addressBar.getText());
-    bookmarkButtonDelete.setEnabled(true);
+    deleteBookmarkButton.setEnabled(true);
   }
 
+  // Action: click on remove-bookmark button
+  // will run methods on BookmarkModel class
   public void deleteBookmarkAction() {
     bookmarkModel.removeBookmark(addressBar.getText());
     if (bookmarkModel.getRowCount() == 0) {
-      bookmarkButtonDelete.setEnabled(false);
+      deleteBookmarkButton.setEnabled(false);
     }
   }
 
-  public void bookmarkClick(MouseEvent e) {
+  // Action: click on specific bookmark 
+  public void handleAllBookmarkTableClicks(MouseEvent e) {
     int row = bookmarkTable.rowAtPoint(e.getPoint());
     int col = bookmarkTable.columnAtPoint(e.getPoint());
-    if (row >= 0 && col >= 0) {
-      String clickedString = (String)(bookmarkTable.getValueAt(row, col));
-      String clickedLink = bookmarkModel.getLinkByName(clickedString);
-      addressBar.setText(clickedLink);
-      clearForwardHistory();
-      updatePage();
+    if ((SwingUtilities.isRightMouseButton(e))) {
+      
+      // right mouse-key: edit mode
+      bookmarkTable.editCellAt(row, col);
+    } else {
+      
+      // left mouse-key (or other): goto bokmark url mode
+      if (row > -1 && col > -1) {
+        String clickedString = (String)(bookmarkTable.getValueAt(row, col));
+        String clickedLink = bookmarkModel.getLinkByName(clickedString);
+        addressBar.setText(clickedLink);
+        clearForwardHistory();
+        updatePage();
+      }
     }
   }
 
@@ -124,49 +153,46 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     history = new ArrayList<String>();
     kit = new HTMLEditorKit();
     setEditable(false);
-    //setContentType("text/html");
 
     buildFrame();
-    addHyperlinkListener(this);
+    addHyperlinkListener(this); // makes link clickable
     showedError = false;
 
-    table = buildTableModel(new String[] {"Webbadress", "Beskrivning"}, false, false);
+    // create the url-table
+    table = buildTable(new String[] {"Webbadress", "Beskrivning"}, false, false);
     model = (MyOwnModel)(table.getModel());
 
-    bookmarkTable = buildTableModel(new String[] {"Bokmärkesnamn"}, true, true);
+    // create the bookmark-table with mouse-listener
+    bookmarkTable = buildTable(new String[] {"Bokmärkesnamn"}, true, true);
     bookmarkModel = (BookmarkModel)(bookmarkTable.getModel());
     bookmarkTable.addMouseListener(new MouseAdapter() {
-      public void mouseClicked(MouseEvent e) {
-        if ((SwingUtilities.isRightMouseButton(e))) {
-          int row = bookmarkTable.rowAtPoint(e.getPoint());
-          int col = bookmarkTable.columnAtPoint(e.getPoint());
-          bookmarkTable.editCellAt(row, col);
-        } else {
-          bookmarkClick(e);
-        }
-      }
+      public void mouseClicked(MouseEvent e) {handleAllBookmarkTableClicks(e);}
     });
 
     JPanel masterButtonPanel = new JPanel();
     masterButtonPanel.setLayout(new GridLayout(2,2));
 
-    bookmarkButton = new JButton("Add Bookmark");
-    masterButtonPanel.add(bookmarkButton);
-    bookmarkButton.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {bookmarkAction();}
+
+
+    // ********** Repetitive code bellow **********
+    addBookmarkButton = new JButton("Add Bookmark");
+    masterButtonPanel.add(addBookmarkButton);
+    addBookmarkButton.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {addBookmarkAction();}
     });
 
-    bookmarkButtonDelete = new JButton("Delete Bookmark");
-    if (bookmarkModel.getRowCount() == 0) {
-      bookmarkButtonDelete.setEnabled(false);
-    } else {
-      bookmarkButtonDelete.setEnabled(true);
-    }
-    masterButtonPanel.add(bookmarkButtonDelete);
-    bookmarkButtonDelete.addActionListener(new ActionListener() {
+    deleteBookmarkButton = new JButton("Delete Bookmark");
+    masterButtonPanel.add(deleteBookmarkButton);
+    deleteBookmarkButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {deleteBookmarkAction();}
     });
-
+    // ********** Repetitive code above **********
+    
+    
+    
+    
+    // ********** Repetitive code bellow **********
+    // wish I could use JS "pass-function-as-variable" here for 
     backButton = new JButton("<");
     backButton.setEnabled(false);
     backButton.addActionListener(new ActionListener() {
@@ -178,6 +204,9 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     forwardButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {forwardAction();}
     });
+    // ********** Repetitive code above **********
+    
+    
     masterButtonPanel.add(backButton);
     masterButtonPanel.add(forwardButton);
 
@@ -199,27 +228,36 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     frame.setLocationRelativeTo(null);
     frame.setVisible(true);
 
-
+    activateOrDeactivateNavButtons();
     updatePage();
     //addBookmarks();
     //writeBookMarksToFile();
   }
 
+  // handles navigation upon press on backward or forward
+  public void backOrForwardNavigationAction(String direction) {
+    if(direction == "back") {
+      history_index -= 1;
+    } else if(direction == "forward") {
+      history_index += 1;
+    } else {System.out.println("ERROR in backOrForwardNavigationAction");}
+    String url = history.get(history_index);
+    addressBar.setText(url);
+    updatePage(false);
+  }
+  
+  // Action: click on back-button
   public void backAction() {
-    history_index -= 1;
-    String url = history.get(history_index);
-    addressBar.setText(url);
-    updatePage(false);
+    backOrForwardNavigationAction("back");
   }
 
+  // Action: click on back-button
   public void forwardAction() {
-    history_index += 1;
-    String url = history.get(history_index);
-    addressBar.setText(url);
-    updatePage(false);
+    backOrForwardNavigationAction("forward");
   }
 
-  public void activateNavButtons() {
+  // handles whenether nav buttons should be active or not
+  public void activateOrDeactivateNavButtons() {
     if (history_index > 0) {
       backButton.setEnabled(true);
     } else {
@@ -233,6 +271,8 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     }
   }
 
+  // sets the page of the url, makes
+  // it viewable in browser.
   public void setPageHanlder(String url) {
     try {
       setPage(url);
@@ -243,30 +283,39 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     }
   }
 
+  // refer to complete function, this one assumes
+  // the url should be added to history
   public void updatePage() {
     updatePage(true);
   }
 
+  // handles all the stuff needed for when 
+  // a new url has been entered.
+  // with ERROR DETECTION to prevent adding
+  // faulty links to history.
   public void updatePage(Boolean addToHistory) {
     showedError = false;
      try {
       webpage = addressBar.getText();
-      activateNavButtons();
+      activateOrDeactivateNavButtons();
       setPageHanlder(webpage);
       getHrefLinks();
       
+      // Error detection incorp.
       if (addToHistory && !showedError) {
         history.add(webpage);
         history_index += 1;
-        activateNavButtons();
+        activateOrDeactivateNavButtons();
       }
       
-      updateTableModel();
+      updateLinkTableModel();
     } catch (Throwable t) {
       //t.printStackTrace();
     }
   }
 
+  // removes all urls from global history list
+  // with respect to current index position
   public void clearForwardHistory() {
     int current_size = history.size();
     for (int i=0; i<(current_size-1-history_index); i++) {
@@ -274,11 +323,15 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     }
   }
 
+  // Triggered on pressing enter on url-bar,
+  // will clear history
   public void actionPerformed(ActionEvent e) {
     clearForwardHistory();
     updatePage();
   }
 
+  // Triggered upon click on link in browser,
+  // will clear history
   public void hyperlinkUpdate(HyperlinkEvent e) {
     HyperlinkEvent.EventType eventType = e.getEventType();
     if (eventType == HyperlinkEvent.EventType.ACTIVATED) {
@@ -289,6 +342,8 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     clearForwardHistory();
   }
 
+  // JOptionPane popup, prevents multiple popups
+  // occuring at the same time 
   public void showErrorPopup(String message) {
     if (!showedError) {
       showedError = true;
@@ -297,8 +352,5 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     }
   }
 
-  public static String initalWebpage() {
-    return "http://www.nada.kth.se/~henrik";
-  }
 
 }

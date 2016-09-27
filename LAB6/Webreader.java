@@ -12,6 +12,16 @@ import javax.swing.event.HyperlinkListener;
 import java.util.Arrays;
 import java.util.ArrayList;
 
+// Websites that might be useable
+//
+// http://www.nada.kth.se/~orjan
+// http://www.nada.kth.se/~ala
+// http://www.nada.kth.se/~henrik
+// http://www.nada.kth.se/~viggo
+// http://www.nada.kth.se/~vahid
+// http://www.nada.kth.se/~johanh
+// http://www.nada.kth.se/~ann
+
 public class Webreader extends JEditorPane implements ActionListener, HyperlinkListener {
 
   boolean showedError;
@@ -23,14 +33,14 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
   JFrame frame;
 
   public static void main(String[] args) {
-    webpage = initalWebpage();
+    webpage = "http://www.nada.kth.se/~henrik";
     Webreader obj = new Webreader();
   }
   
   public Webreader() {
     setEditable(false);
     buildFrame();
-    buildModel();
+    buildLinkTable();
     addHyperlinkListener(this);
 
     JPanel parentPanel = new JPanel(new BorderLayout());
@@ -52,18 +62,22 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     updatePage();
   }
   
+  // handles all the stuff needed for when 
+  // a new url has been entered
   public void updatePage() {
     showedError = false;
     try {
       webpage = addressBar.getText();
       getHrefLinks(webpage);
       setPageHanlder(webpage);
-      updateModel();
+      updateLinkTableModel();
     } catch (Throwable t) {
       //t.printStackTrace();
     }
   }
 
+  // stores the a-href attributes and content
+  // in the global ArrayLists
   public void getHrefLinks(String webpage) {
     try {
       InputStream in = new URL(webpage).openConnection().getInputStream();
@@ -94,7 +108,9 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     }
   }
   
-  public void updateModel() {
+  // updates the model of the link table
+  // displayed in the frame.
+  public void updateLinkTableModel() {
     int rows = model.getRowCount();
     for (int i=0;i<rows;i++) {
       model.removeRow(0);
@@ -104,6 +120,8 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     }
   }
 
+  // used once in beginning of run
+  // to create browser-frame
   public void buildFrame() {
     frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -115,13 +133,17 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     frame.add(addressBar, BorderLayout.NORTH);
   }
 
-  public void buildModel() {
+  // used once in beginning of run
+  // to create model & JTable of href links. 
+  public void buildLinkTable() {
     model = new DefaultTableModel();
     table = new JTable(model);
     model.addColumn("Webbadress");
     model.addColumn("Beskrivning");
   }
 
+  // sets the page of the url, makes
+  // it viewable in browser.
   public void setPageHanlder(String url) {
     try {
       setPage(url);
@@ -130,6 +152,8 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     }
   }
   
+  // JOptionPane popup, prevents multiple popups
+  // occuring at the same time 
   public void showErrorPopup(String message) {
     if (!showedError) {
       showedError = true;
@@ -138,22 +162,12 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     }
   }
 
+  // Triggered on pressing enter on url-bar
   public void actionPerformed(ActionEvent e) {
     updatePage();
   }
-
-  public static String initalWebpage() {
-    String url;
-    //url = "http://www.nada.kth.se/~orjan";
-    //url = "http://www.nada.kth.se/~ala";
-    url = "http://www.nada.kth.se/~henrik";
-    //url = "http://www.nada.kth.se/~viggo";
-    //url = "http://www.nada.kth.se/~vahid";
-    //url = "http://www.nada.kth.se/~johanh";
-    //url = "http://www.nada.kth.se/~ann";
-    return url;
-  }
   
+  // Triggered upon click on link in browser
   public void hyperlinkUpdate(HyperlinkEvent e) {
     HyperlinkEvent.EventType eventType = e.getEventType();
     if (eventType == HyperlinkEvent.EventType.ACTIVATED) {

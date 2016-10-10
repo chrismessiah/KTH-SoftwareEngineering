@@ -72,7 +72,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
       }
     } catch (Exception e) {
       //System.out.println(e);
-      System.out.println("2");
+      //System.out.println("2");
       shouldNotClearHistoryDueToError = true;
       showErrorPopup("BAD URL: " + webpage);
     }
@@ -131,7 +131,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
         deleteBookmarkButton.setEnabled(false);
       }
     } catch (ArrayIndexOutOfBoundsException e) {
-      System.out.println("3");
+      //System.out.println("3");
       showErrorPopup("Trying to delete a bookmark which does not exist!");
       showedError = false;
       shouldNotClearHistoryDueToError = true;
@@ -251,7 +251,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     } else if(direction == "forward") {
       history_index += 1;
     } else {System.out.println("ERROR in backOrForwardNavigationAction");}
-    System.out.println("Size: " + history.size() + "   Index: " + history_index + "       backOrForwardNavigationAction()");
+    //System.out.println("Size: " + history.size() + "   Index: " + history_index + "       backOrForwardNavigationAction()");
     String url = history.get(history_index);
     addressBar.setText(url);
     updatePage(false, false);
@@ -288,7 +288,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     try {
       setPage(url);
     } catch(Exception e) {
-      System.out.println("4");
+      //System.out.println("4");
       //System.out.println(e);
       //e.printStackTrace();
       shouldNotClearHistoryDueToError = true;
@@ -320,7 +320,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
       
       updateLinkTableModel();
     } catch (Throwable t) {
-      System.out.println("1");
+      //System.out.println("1");
       //t.printStackTrace();
     }
   }
@@ -329,24 +329,24 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
   // with respect to current index position
   public void clearForwardHistory() {
     if (!shouldNotClearHistoryDueToError) {
-      System.out.println("********* clearForwardHistory() WAS TRIGGERED *********");
+      //System.out.println("********* clearForwardHistory() WAS TRIGGERED *********");
       int current_size = history.size();
       for (int i=0; i<(current_size-1-history_index); i++) {
         history.remove(history.size()-1);
       }
       if (history.size()-1 < history_index) {
-        System.out.println("********* Index too large for list, decrementing *********");
+        //System.out.println("********* Index too large for list, decrementing *********");
         history_index = history.size()-1;
       }
     } else {
-      System.out.println("********* clearForwardHistory() not triggered due to previous error *********");
+    //  System.out.println("********* clearForwardHistory() not triggered due to previous error *********");
     }
   }
 
   // Triggered on pressing enter on url-bar,
   // will clear history
   public void actionPerformed(ActionEvent e) {
-    System.out.println("********* actionPerformed() *********");
+    //System.out.println("********* actionPerformed() *********");
     updatePage(true, true);
   }
 

@@ -247,6 +247,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     } else if(direction == "forward") {
       history_index += 1;
     } else {System.out.println("ERROR in backOrForwardNavigationAction");}
+    System.out.println("Size: " + history.size() + "   Index: " + history_index + "       backOrForwardNavigationAction()");
     String url = history.get(history_index);
     addressBar.setText(url);
     updatePage(false);
@@ -311,6 +312,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
       if (addToHistory && !showedError) {
         history.add(webpage);
         history_index += 1;
+        System.out.println("Size: " + history.size() + "   Index: " + history_index + "       updatePage()");
         activateOrDeactivateNavButtons();
       }
       
@@ -323,15 +325,21 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
   // removes all urls from global history list
   // with respect to current index position
   public void clearForwardHistory() {
+    System.out.println("********* clearForwardHistory() WAS TRIGGERED *********");
     int current_size = history.size();
     for (int i=0; i<(current_size-1-history_index); i++) {
       history.remove(history.size()-1);
+    }
+    if (history.size()-1 < history_index) {
+      System.out.println("********* Index too large for list, decrementing *********");
+      history_index = history.size()-1;
     }
   }
 
   // Triggered on pressing enter on url-bar,
   // will clear history
   public void actionPerformed(ActionEvent e) {
+    System.out.println("********* actionPerformed() *********");
     clearForwardHistory();
     updatePage();
   }
@@ -343,9 +351,9 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     if (eventType == HyperlinkEvent.EventType.ACTIVATED) {
       String url = e.getURL().toString();
       addressBar.setText(url);
+      clearForwardHistory();
       updatePage();
     }
-    clearForwardHistory();
   }
 
   // JOptionPane popup, prevents multiple popups

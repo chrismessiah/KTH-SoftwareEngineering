@@ -125,7 +125,7 @@ class NewTreeX extends TreeFrame {
 	// for quitting program
 	public void actionPerformed(ActionEvent e) {
 		String cmd = e.getActionCommand();
-		if (cmd.equals(closeString))
+		if (cmd.equals(closeString)) // inheirited from Treeframe
 			dispose();
 			System.exit(0);
 	}
@@ -133,6 +133,8 @@ class NewTreeX extends TreeFrame {
 	void showDetails(TreePath p){
 		if (p == null) {return;} // as made in TreeFrame
 		Node node = rootXML;
+		
+		// find all nodes in path, get their names and make a string
 		ArrayList<String> stringPathArray = new ArrayList<String>();
 		Object[] pathArray = p.getPath();
 		for (int i=1;i<pathArray.length; i++) {
@@ -146,6 +148,7 @@ class NewTreeX extends TreeFrame {
 			whatIs += " är " + attr;
 		}
 		whatIs += " är " + getNodeAttributeValue(rootXML);
+		
 		String out = node.getNodeName() + ": " + getNodeAttributeValue(node) + " " + getTextContentOfNode(node) + "\n\n" + "Allt som" + whatIs + ".";
 		JOptionPane.showMessageDialog(this, out);
 	}

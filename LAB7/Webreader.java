@@ -25,7 +25,7 @@ import java.lang.ArrayIndexOutOfBoundsException;
 
 public class Webreader extends JEditorPane implements ActionListener, HyperlinkListener {
 
-  boolean showedError;
+  boolean showedError, shouldNotClearHistoryDueToError;
   JTextField addressBar;
   static String webpage;
   ArrayList<String> href, descr, history;
@@ -72,6 +72,8 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
       }
     } catch (Exception e) {
       //System.out.println(e);
+      System.out.println("2");
+      shouldNotClearHistoryDueToError = true;
       showErrorPopup("BAD URL: " + webpage);
     }
   }
@@ -129,8 +131,10 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
         deleteBookmarkButton.setEnabled(false);
       }
     } catch (ArrayIndexOutOfBoundsException e) {
+      System.out.println("3");
       showErrorPopup("Trying to delete a bookmark which does not exist!");
       showedError = false;
+      shouldNotClearHistoryDueToError = true;
     }
   }
 
@@ -149,8 +153,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
         String clickedString = (String)(bookmarkTable.getValueAt(row, col));
         String clickedLink = bookmarkModel.getLinkByName(clickedString);
         addressBar.setText(clickedLink);
-        clearForwardHistory();
-        updatePage();
+        updatePage(true, true);
       }
     }
   }
@@ -163,7 +166,8 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     buildFrame();
     addHyperlinkListener(this); // makes link clickable
     showedError = false;
-
+    shouldNotClearHistoryDueToError = false;
+    
     // create the url-table
     table = buildTable(new String[] {"Webbadress", "Beskrivning"}, false, false);
     model = (MyOwnModel)(table.getModel());
@@ -235,7 +239,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     frame.setVisible(true);
 
     activateOrDeactivateNavButtons();
-    updatePage();
+    updatePage(true, false);
     //addBookmarks();
     //writeBookMarksToFile();
   }
@@ -250,7 +254,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     System.out.println("Size: " + history.size() + "   Index: " + history_index + "       backOrForwardNavigationAction()");
     String url = history.get(history_index);
     addressBar.setText(url);
-    updatePage(false);
+    updatePage(false, false);
   }
   
   // Action: click on back-button
@@ -284,29 +288,27 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     try {
       setPage(url);
     } catch(Exception e) {
+      System.out.println("4");
       //System.out.println(e);
       //e.printStackTrace();
+      shouldNotClearHistoryDueToError = true;
       showErrorPopup("BAD URL: " + url);
     }
-  }
-
-  // refer to complete function, this one assumes
-  // the url should be added to history
-  public void updatePage() {
-    updatePage(true);
   }
 
   // handles all the stuff needed for when 
   // a new url has been entered.
   // with ERROR DETECTION to prevent adding
   // faulty links to history.
-  public void updatePage(Boolean addToHistory) {
+  public void updatePage(Boolean addToHistory, Boolean clearForwardHistoryBool) {
     showedError = false;
+    shouldNotClearHistoryDueToError = false;
      try {
       webpage = addressBar.getText();
+      getHrefLinks();
+      if (clearForwardHistoryBool && !shouldNotClearHistoryDueToError) {clearForwardHistory();}
       activateOrDeactivateNavButtons();
       setPageHanlder(webpage);
-      getHrefLinks();
       
       // Error detection incorp.
       if (addToHistory && !showedError) {
@@ -318,6 +320,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
       
       updateLinkTableModel();
     } catch (Throwable t) {
+      System.out.println("1");
       //t.printStackTrace();
     }
   }
@@ -325,14 +328,18 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
   // removes all urls from global history list
   // with respect to current index position
   public void clearForwardHistory() {
-    System.out.println("********* clearForwardHistory() WAS TRIGGERED *********");
-    int current_size = history.size();
-    for (int i=0; i<(current_size-1-history_index); i++) {
-      history.remove(history.size()-1);
-    }
-    if (history.size()-1 < history_index) {
-      System.out.println("********* Index too large for list, decrementing *********");
-      history_index = history.size()-1;
+    if (!shouldNotClearHistoryDueToError) {
+      System.out.println("********* clearForwardHistory() WAS TRIGGERED *********");
+      int current_size = history.size();
+      for (int i=0; i<(current_size-1-history_index); i++) {
+        history.remove(history.size()-1);
+      }
+      if (history.size()-1 < history_index) {
+        System.out.println("********* Index too large for list, decrementing *********");
+        history_index = history.size()-1;
+      }
+    } else {
+      System.out.println("********* clearForwardHistory() not triggered due to previous error *********");
     }
   }
 
@@ -340,8 +347,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
   // will clear history
   public void actionPerformed(ActionEvent e) {
     System.out.println("********* actionPerformed() *********");
-    clearForwardHistory();
-    updatePage();
+    updatePage(true, true);
   }
 
   // Triggered upon click on link in browser,
@@ -351,8 +357,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
     if (eventType == HyperlinkEvent.EventType.ACTIVATED) {
       String url = e.getURL().toString();
       addressBar.setText(url);
-      clearForwardHistory();
-      updatePage();
+      updatePage(true, true);
     }
   }
 

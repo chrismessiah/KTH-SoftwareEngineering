@@ -11,6 +11,7 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.lang.ArrayIndexOutOfBoundsException;
 
 // Websites that might be useable
 //
@@ -122,9 +123,14 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
   // Action: click on remove-bookmark button
   // will run methods on BookmarkModel class
   public void deleteBookmarkAction() {
-    bookmarkModel.removeBookmark(addressBar.getText());
-    if (bookmarkModel.getRowCount() == 0) {
-      deleteBookmarkButton.setEnabled(false);
+    try {
+      bookmarkModel.removeBookmark(addressBar.getText());
+      if (bookmarkModel.getRowCount() == 0) {
+        deleteBookmarkButton.setEnabled(false);
+      }
+    } catch (ArrayIndexOutOfBoundsException e) {
+      showErrorPopup("Trying to delete a bookmark which does not exist!");
+      showedError = false;
     }
   }
 

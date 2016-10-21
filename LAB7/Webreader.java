@@ -250,7 +250,9 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
       history_index -= 1;
     } else if(direction == "forward") {
       history_index += 1;
-    } else {System.out.println("ERROR in backOrForwardNavigationAction");}
+    } else {
+      //System.out.println("ERROR in backOrForwardNavigationAction");
+    }
     //System.out.println("Size: " + history.size() + "   Index: " + history_index + "       backOrForwardNavigationAction()");
     String url = history.get(history_index);
     addressBar.setText(url);
@@ -314,7 +316,7 @@ public class Webreader extends JEditorPane implements ActionListener, HyperlinkL
       if (addToHistory && !showedError) {
         history.add(webpage);
         history_index += 1;
-        System.out.println("Size: " + history.size() + "   Index: " + history_index + "       updatePage()");
+        //System.out.println("Size: " + history.size() + "   Index: " + history_index + "       updatePage()");
         activateOrDeactivateNavButtons();
       }
       

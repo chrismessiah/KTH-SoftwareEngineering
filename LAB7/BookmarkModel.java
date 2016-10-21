@@ -126,7 +126,7 @@ public class BookmarkModel extends DefaultTableModel {
 			out.write(stringToWrite, 0, stringToWrite.length());
 			out.flush();
 		} catch (IOException e) {
-			System.out.println(e);
+			//System.out.println(e);
 		}
 	}
 
@@ -151,7 +151,7 @@ public class BookmarkModel extends DefaultTableModel {
 					}
 				}
 		} catch (IOException e) {
-			System.out.println(e);
+			//System.out.println(e);
 		}
 	}
 
